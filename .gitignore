@@ -1,0 +1,10 @@
+venv/
+.vscode/
+
+scene/models/
+scene/pcl_results/
+scene/multiscene_results/
+
+*.json
+*.npy
+*.urdf

@@ -6,14 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
-          content="Implicit Neural Representations with Periodic Activation Functions">
-    <meta name="author" content="Vincent Sitzmann,
-                                Julien Martel,
-                                Alex Bergman,
-                                David Lindell,
-								Gordon Wetzstein">
+          content="Building a pointcloud library of objects">
+    <meta name="author" content="Wei-En Wang">
 
-    <title>Implicit Neural Representations with Periodic Activation Functions</title>
+    <title>Building a pointcloud library of objects</title>
     <!-- Bootstrap core CSS -->
     <!--link href="bootstrap.min.css" rel="stylesheet"-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -27,74 +23,28 @@
 <body>
 <div class="jumbotron jumbotron-fluid">
     <div class="container"></div>
-    <h2>Implicit Neural Representations<br>with Periodic Activation Functions</h2>
-    <h3>NeurIPS 2020 (Oral)</h3>
+    <h2>Building a pointcloud library of objects</h2>
 <!--            <p class="abstract">An interpretable, data-efficient, and scalable neural scene representation.</p>-->
     <hr>
     <p class="authors">
-        <a href="http://www.stanford.edu/~sitzmann/"> Vincent Sitzmann*</a>,
-        <a href="http://www.jmartel.net"> Julien N. P. Martel*</a>,
-        <a href="http://alexanderbergman7.github.io"> Alexander Bergman</a>,</br>
-        <a href="http://www.davidlindell.com/"> David B. Lindell</a>,
-        <a href="https://stanford.edu/~gordonwz/"> Gordon Wetzstein</a>
+        <h4>Wei-En Wang</a>
     </p>
-    <div class="btn-group" role="group" aria-label="Top menu">
-        <a class="btn btn-primary" href="https://arxiv.org/abs/2006.09661">Paper</a>
-        <a class="btn btn-primary" href="https://colab.research.google.com/github/vsitzmann/siren/blob/master/explore_siren.ipynb">Colab Notebook</a>
-        <a class="btn btn-primary" href="https://dcato98.github.io/playground/#activation=sine">Tensorflow Playground</a>
-        <a class="btn btn-primary" href="https://github.com/vsitzmann/siren">Code</a>
-        <a class="btn btn-primary" href="https://drive.google.com/drive/u/1/folders/1_iq__37-hw7FJOEUK1tX7mdp8SKB368K">Data</a>
-    </div>
+    <!-- <div class="btn-group" role="group" aria-label="Top menu">
+        <a class="btn btn-primary" href="">Paper</a>
+        <a class="btn btn-primary" href="">Colab Notebook</a>
+        <a class="btn btn-primary" href="">Code</a>
+        <a class="btn btn-primary" href="">Data</a>
+    </div> -->
 </div>
 
 <div class="container">
     <div class="section">
-        <div class="vcontainer">
-            <iframe class='video' src="https://www.youtube.com/embed/Q2fLWGBeaiI" frameborder="0"
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen></iframe>
-        </div>
+        <h2>Introduction</h2>
         <hr>
         <p>
-            Implicitly defined, continuous, differentiable signal representations parameterized
-            by neural networks have emerged as a powerful paradigm, offering many possible
-            benefits over conventional representations.
-
-            However, current network architectures
-            for such implicit neural representations are incapable of modeling signals
-            with fine detail, and fail to represent a signal’s spatial and temporal derivatives,
-            despite the fact that these are essential to many physical signals defined implicitly
-            as the solution to partial differential equations.
-
-            We propose to leverage periodic
-            activation functions for implicit neural representations and demonstrate that these
-            networks, dubbed sinusoidal representation networks or SIREN, are ideally suited
-            for representing complex natural signals and their derivatives.
-
-            We analyze SIREN
-            activation statistics to propose a principled initialization scheme and demonstrate
-            the representation of images, wavefields, video, sound, and their derivatives. Further,
-            we show how SIREN s can be leveraged to solve challenging boundary value
-            problems, such as particular Eikonal equations (yielding signed distance functions),
-            the Poisson equation, and the Helmholtz and wave equations. Lastly, we combine
-            SIREN with hypernetworks to learn priors over the space of SIREN functions.
+            In this project, I adopted an improved version of the <i>Iterative Closest Point</i> algorithm to merge the pointclouds of an object obtained from different perspectives. 
         </p>
     </div>
-
-    <div class="section">
-        <h2>Baselines</h2>
-        <hr>
-        <p>
-            The following results compare SIREN to a variety of network architectures. <b>TanH</b>, <b>ReLU</b>,
-            <b>Softplus</b> etc. means an MLP of equal size with the respective nonlinearity.
-            We also compare to the recently proposed positional encoding, combined with a ReLU nonlinearity, noted as
-            <b>ReLU P.E.</b>
-            SIREN outperforms all baselines by a significant margin, converges significantly faster, and is the only
-            architecture that accurately represents the gradients of the signal, enabling its use to solve boundary
-            value problems.
-        </p>
-    </div>
-
     <div class="section">
         <h2>Representing images</h2>
         <hr>
@@ -453,19 +403,19 @@
         </div>
 
     <div class="section">
-        <h2>Paper</h2>
+        <h2>References</h2>
         <hr>
         <div>
             <div class="list-group">
-                <a href="https://arxiv.org/abs/2006.09661"
+                <a href="https://users.cs.duke.edu/~tomasi/papers/phillips/phillips3DIM07.pdf"
                    class="list-group-item">
-                    <img src="img/paper_thumbnail.png" style="width:100%; margin-right:-20px; margin-top:-10px;">
+                    <!-- <img src="img/paper_thumbnail.png" style="width:100%; margin-right:-20px; margin-top:-10px;"> -->
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="section">
+    <!-- <div class="section">
         <h2>Bibtex</h2>
         <hr>
         <div class="bibtexsection">
@@ -481,13 +431,9 @@
                 year={2020}
             }
         </div>
-    </div>
+    </div> -->
 
     <hr>
-
-    <footer>
-        <p>Send feedback and questions to <a href="http://web.stanford.edu/~sitzmann/">Vincent Sitzmann</a></p>
-    </footer>
 </div>
 
 
