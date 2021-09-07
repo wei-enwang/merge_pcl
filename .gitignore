@@ -1,10 +1,16 @@
 venv/
 .vscode/
 
-scene/models/
-scene/pcl_results/
-scene/multiscene_results/
+src/clouds/
+src/models/
+src/pcl_results/
+src/multiscene_results/
 
 *.json
 *.npy
 *.urdf
+
+# Byte-compiled / optimized / DLL files
+src/__pycache__/
+*.py[cod]
+*$py.class
