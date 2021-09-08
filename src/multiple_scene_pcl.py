@@ -14,7 +14,7 @@ from create_scene import Scene, parse_steps
 if __name__=="__main__":
 
     colors = ['b', 'g', 'r', 'c', 'm', 'y']
-    num_scenes = 2
+    num_scenes = 20
 
     # icp params
     trials = 5
@@ -44,14 +44,14 @@ if __name__=="__main__":
 
     img = scene.place_objects(objects, vis=True)    
     orig_pcl = scene.get_segmented_pointcloud(jsonify=False)
-    imwrite("multiscene_results/trial5/original_scene.png", img)
+    imwrite("multiscene_results/trial6/original_scene.png", img)
     print("New image registered!")
 
     for i in range(num_scenes):
 
         # scene.set_random_view_matrix()
         img = scene.shuffle_objects(vis=True)
-        imwrite(f"multiscene_results/trial5/scene_{i+1}.png", img)
+        imwrite(f"multiscene_results/trial6/scene_{i+1}.png", img)
         shuffled_pcl = scene.get_segmented_pointcloud(jsonify=False)
         print("New image registered!")
     
@@ -69,6 +69,9 @@ if __name__=="__main__":
 
             n_A = dst_cloud.shape[0]
             n_B = src_cloud.shape[0]
+
+            if n_A == 0 or n_B == 0:
+                continue
 
             if n_A < n_B:
                 src_cloud, dst_cloud = dst_cloud, src_cloud
@@ -88,24 +91,27 @@ if __name__=="__main__":
 
             min_i = 0
 
-            # if min_err >= stop_thresh:
-            #     T, err, frac = random_icp(mir1_cloud, dst_cloud, max_iter=max_iter,
-            #     stop_thresh=stop_thresh, trials=trials, lam=lamda, tolerance=tol)
-            #     if err < min_err:
-            #         min_T, min_err, min_frac = T, err, frac
-            #         min_i = 1
-            #     if min_err >= stop_thresh:
-            #         T, err, frac = random_icp(mir2_cloud, dst_cloud, max_iter=max_iter, 
-            #         stop_thresh=stop_thresh, trials=trials, lam=lamda, tolerance=tol)
-            #         if err < min_err:
-            #             min_T, min_err, min_frac = T, err, frac
-            #             min_i = 2
-            #         if min_err >= stop_thresh:
-            #             T, err, frac = random_icp(mir3_cloud, dst_cloud, max_iter=max_iter, 
-            #             stop_thresh=stop_thresh, trials=trials, lam=lamda, tolerance=tol)
-            #             if err < min_err:
-            #                 min_T, min_err, min_frac = T, err, frac
-            #                 min_i = 3
+            if min_err >= stop_thresh:
+                T, err, frac = random_icp(mir1_cloud, dst_cloud, max_iter=max_iter,
+                stop_thresh=stop_thresh, trials=trials, lam=lamda, tolerance=tol)
+                if err < min_err:
+                    min_T, min_err, min_frac = T, err, frac
+                    min_i = 1
+                if min_err >= stop_thresh:
+                    T, err, frac = random_icp(mir2_cloud, dst_cloud, max_iter=max_iter, 
+                    stop_thresh=stop_thresh, trials=trials, lam=lamda, tolerance=tol)
+                    if err < min_err:
+                        min_T, min_err, min_frac = T, err, frac
+                        min_i = 2
+                    if min_err >= stop_thresh:
+                        T, err, frac = random_icp(mir3_cloud, dst_cloud, max_iter=max_iter, 
+                        stop_thresh=stop_thresh, trials=trials, lam=lamda, tolerance=tol)
+                        if err < min_err:
+                            min_T, min_err, min_frac = T, err, frac
+                            min_i = 3
+
+            if min_err >= 0.015:
+                continue
 
             if min_i == 0:
                 chosen_cloud = src_cloud

@@ -1,7 +1,7 @@
 import open3d as o3d
 import os
 
-data_path = os.path.join(os.getcwd(), "./clouds/")
+data_path = os.path.join(os.getcwd(), "../clouds/")
 
 for file in os.listdir(data_path):
     if file.endswith(".ply"):
