@@ -14,20 +14,21 @@ from create_scene import Scene, parse_steps
 if __name__=="__main__":
 
     colors = ['b', 'g', 'r', 'c', 'm', 'y']
-    num_scenes = 20
+    num_scenes = 10
 
     # icp params
     trials = 5
-    lamda = 2
+    lamda = 1.8
     tol = 1e-6
     max_iter = 50
     stop_thresh = 0.0015
 
     data_path = "clouds/"
+    mid_iteration = 5
 
     # merge params
     radius = 0.002
-    err_threshold = 0.0025
+    err_threshold = 0.003
     voxel_threshold = 0.003
     dict_of_clouds = {}
 
@@ -44,7 +45,7 @@ if __name__=="__main__":
 
     img = scene.place_objects(objects, vis=True)    
     orig_pcl = scene.get_segmented_pointcloud(jsonify=False)
-    imwrite("multiscene_results/trial6/original_scene.png", img)
+    imwrite("multiscene_results/trial6/scene_0.png", img)
     print("New image registered!")
 
     for i in range(num_scenes):
@@ -137,13 +138,16 @@ if __name__=="__main__":
             else:
                 dict_of_clouds[item] = dst_cloud
 
+            if i+1 == mid_iteration:
+                # save in progress pointcloud
+                mid_pcd = o3d.geometry.PointCloud()
+                mid_pcd.points = o3d.utility.Vector3dVector(dict_of_clouds[item])
+                o3d.io.write_point_cloud(data_path+str(item)+"_mid.ply", mid_pcd)
+
     for item in scene.objects:
 
         orig_cloud = compute_occupancy(np.array(orig_pcl[item]), tresh=voxel_threshold)
         final_cloud = dict_of_clouds[item]
-
-        # save_as_obj(orig_cloud, save_obj_path, str(item)+"_first.obj")
-        # save_as_obj(final_cloud, save_obj_path, str(item)+"_total.obj")
 
 
         n1 = orig_cloud.shape[0]
