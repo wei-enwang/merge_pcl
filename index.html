@@ -56,7 +56,7 @@
             Here's the details on how I align and merge clouds:<br>
             <ul>
             <li>Points are sampled from the larger cloud to make its size the same as the smaller one. (The tranformation matrix computed by the SVD method performs badly if I directly find the nearest neighbors from one cloud to another without this process.) The points selected are random so I perform the whole process several(5) times and take the one that produces the lowest error.</li>
-            <li>As icp’s performance is reliant on the clouds’ initial orientation, I also perform icp on clouds that are formed by rotating one of the two clouds 180 degrees about the x, y, and z axes, leading to 4 clouds for each new view of an item. Thus, I end up running 4*5=20 icps for each item.</li>>
+            <li>As icp’s performance is reliant on the clouds’ initial orientation, I also perform icp on clouds that are formed by rotating one of the two clouds 180 degrees about the x, y, and z axes, leading to 4 clouds for each new view of an item. Thus, I end up running 4*5=20 icps for each item for each new scene.</li>
             <li>The error measure of the adjusted icp, fractional root mean SD (FRMSD), seems to align with the success of the alignment. I merge the two clouds if the FRMSD value of the alignment is below 0.003. Now I am also moving towards t could also be used to identify if the two clouds are from the same object.</li>
             </ul>
         </p>
@@ -71,7 +71,7 @@
         <div class="row align-items-center">
             <div class="col justify-content-center text-center">
                 <video width="50%" playsinline="" autoplay="" loop="" preload="" muted="">
-                    <source src="src/demo.mp4" type="video/mp4">
+                    <source src="./src/demo.mp4" type="video/mp4">
                 </video>
             </div>
             <!-- <div class="col justify-content-center text-center">
