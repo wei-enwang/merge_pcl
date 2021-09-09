@@ -70,16 +70,19 @@
         </p>
         <div class="row align-items-center">
             <div class="col justify-content-center text-center">
-                <video width="50%" playsinline="" autoplay="" loop="" preload="" muted="">
+                
+                <video id="pvid" width="400px" height="400px">
                     <source src="./src/demo.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video.
                 </video>
             </div>
-            <!-- <div class="col justify-content-center text-center">
-                <video width="100%" playsinline="" autoplay="" loop="" preload="" muted="">
-                    <source src="src/bikes_comparison_label.mp4" type="video/mp4">
-                </video>
-            </div> -->
         </div>
+        <div class="row align-items-center">
+            <div class="col justify-content-center text-center">
+                <button id="vidbutton">Play</button> 
+            </div>
+        </div>
+        
     </div>
 
 
@@ -124,7 +127,7 @@
                     </model-viewer>
                 </div>
             </div>
-            <div class="row align-items-center">
+            <div class="row align-items-center vspace-top">
                 <div class="col-md-4 padding-0 canvas-row">
                     <h4>Lock - first scene</h4>
                     <model-viewer
@@ -156,7 +159,7 @@
                     </model-viewer>
                 </div>
             </div>
-            <div class="row align-items-center">
+            <div class="row align-items-center vspace-top">
                 <div class="col-md-4 padding-0 canvas-row">
                     <h4>Headset - first scene</h4>
                     <model-viewer
@@ -188,9 +191,9 @@
                     </model-viewer>
                 </div>
             </div>
-            <!-- <div class="row align-items-center">
+            <div class="row align-items-center vspace-top">
                 <div class="col-md-4 padding-0 canvas-row">
-                    <h4>Another watch - first scene</h4>
+                    <h4>Watch 2 - first scene</h4>
                     <model-viewer
                             alt="Another watch - first scene"
                             src="./src/clouds/9_first.glb"
@@ -200,7 +203,7 @@
                     </model-viewer>
                 </div>
                 <div class="col-md-4 padding-0 canvas-row">
-                    <h4>Another watch - after 5 scenes</h4>
+                    <h4>Watch 2 - after 5 scenes</h4>
                     <model-viewer
                             alt="Another watch - after 5 scenes"
                             src="./src/clouds/9_mid.glb"
@@ -210,7 +213,7 @@
                     </model-viewer>
                 </div>
                 <div class="col-md-4 padding-0 canvas-row">
-                    <h4>Another watch - final scene</h4>
+                    <h4>Watch - final scene</h4>
                     <model-viewer
                             alt="Room ReLU"
                             src="./src/clouds/9_final.glb"
@@ -219,8 +222,8 @@
                             camera-controls>
                     </model-viewer>
                 </div>
-            </div> -->
-            <div class="row align-items-center">
+            </div>
+            <div class="row align-items-center vspace-top">
                 <div class="col-md-4 padding-0 canvas-row">
                     <h4>Hat - first scene</h4>
                     <model-viewer
@@ -354,7 +357,7 @@
             <div class="list-group">
                 <a href="https://users.cs.duke.edu/~tomasi/papers/phillips/phillips3DIM07.pdf"
                    class="list-group-item">
-                    <!-- <img src="img/paper_thumbnail.png" style="width:100%; margin-right:-20px; margin-top:-10px;"> -->
+                    Outlier Robust ICP for Minimizing Fractional RMSD
                 </a>
             </div>
         </div>
@@ -381,6 +384,21 @@
     <hr>
 </div>
 
+<script> 
+var ppbutton = document.getElementById("vidbutton");
+ppbutton.addEventListener("click", playPause);
+myVideo = document.getElementById("pvid");
+function playPause() { 
+    if (myVideo.paused) {
+        myVideo.play();
+        ppbutton.innerHTML = "Pause";
+        }
+    else  {
+        myVideo.pause(); 
+        ppbutton.innerHTML = "Play";
+        }
+} 
+</script> 
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

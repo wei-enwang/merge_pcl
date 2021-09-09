@@ -10,7 +10,7 @@ for filename in glob.glob(data_path+"*.png"):
     size = (width,height)
     img_array.append(img)
  
-fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+fourcc = cv2.VideoWriter_fourcc(*'H264')
 fps = 1
 out = cv2.VideoWriter(data_path+"demo.mp4", fourcc, fps, size)
  
