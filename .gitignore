@@ -14,3 +14,4 @@ src/multiscene_results/
 src/__pycache__/
 *.py[cod]
 *$py.class
+*.pyc
