@@ -3,7 +3,7 @@ import numpy as np
 import glob
  
 img_array = []
-data_path = "../multiscene_results/trial6/"
+data_path = "../multiscene_results/trial8/"
 for filename in glob.glob(data_path+"*.png"):
     img = cv2.imread(filename)
     height, width, layers = img.shape
