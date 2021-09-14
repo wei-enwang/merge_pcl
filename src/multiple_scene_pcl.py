@@ -3,10 +3,12 @@ import numpy as np
 import os
 import random
 import json
+from numpy.lib.npyio import save
 import pybullet as p
 from imageio import imwrite
 import open3d as o3d
 from funcs.save import np_save_as_json
+from clouds.cloud_vis import cloud_to_ply
 from pointcloud import random_icp, merge_cloud, HomoTo3D, compute_occupancy
 from create_scene import Scene, parse_steps
 
@@ -24,12 +26,12 @@ if __name__=="__main__":
     stop_thresh = 0.0015
 
     data_path = "clouds/"
-    mid_iteration = 5
+    mid_iteration = 2
 
     # merge params
     radius = 0.002
     err_threshold = 0.005
-    merge_threshold = 0.002
+    merge_threshold = 0.0025
     voxel_threshold = 0.003
     dict_of_clouds = {}
 
@@ -46,7 +48,7 @@ if __name__=="__main__":
 
     img = scene.place_objects(objects, vis=True)    
     orig_pcl = scene.get_segmented_pointcloud(jsonify=False)
-    imwrite("multiscene_results/trial7/scene_0.png", img)
+    imwrite("multiscene_results/trial8/scene_0.png", img)
     print("New image registered!")
 
     # hypo_count stands for how many hypotheses we have
@@ -58,12 +60,13 @@ if __name__=="__main__":
 
         hypo_count = hypo_count + 1
 
+    cloud_to_ply(dict_of_clouds, save_dir=data_path, suffix="_first")
     # Pass scenes into program
     for i in range(num_scenes):
 
         # scene.set_random_view_matrix()
         img = scene.shuffle_objects(vis=True)
-        imwrite(f"multiscene_results/trial7/scene_{i+1}.png", img)
+        imwrite(f"multiscene_results/trial8/scene_{i+1}.png", img)
         shuffled_pcl = scene.get_segmented_pointcloud(jsonify=False)
         print("New image registered!")
         
@@ -91,7 +94,6 @@ if __name__=="__main__":
                     n_A = dst_cloud.shape[0]
                     if n_A == 0:
                         continue
-
 
                     # rotate the cloud (after first icp) 180 degrees to resolve convergence problems
                     rot1 = np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
@@ -175,21 +177,18 @@ if __name__=="__main__":
         # scene analyze complete, update items' hypothesis
         dict_of_clouds.update(buffer_new_item)
 
-                # if i+1 == mid_iteration:
-                #     # save in progress pointcloud
-                #     mid_pcd = o3d.geometry.PointCloud()
-                #     mid_pcd.points = o3d.utility.Vector3dVector(dict_of_clouds[item])
-                #     o3d.io.write_point_cloud(data_path+str(item)+"_mid.ply", mid_pcd)
+        if i+1 == mid_iteration:
+            # save in progress pointcloud
+            cloud_to_ply(dict_of_clouds, save_dir=data_path, suffix="_mid")
 
     np_save_as_json(dict_of_clouds, data_path+"hypo_clouds.json")
 
-    for item in dict_of_clouds.keys():
+    cloud_to_ply(dict_of_clouds, save_dir=data_path, suffix="_final")
+    # for item in dict_of_clouds.keys():
 
         # orig_cloud = compute_occupancy(np.array(orig_pcl[item]), tresh=voxel_threshold)
-        cloud_list = dict_of_clouds[item]
-        print(f"Item {item}: Number of clouds: {len(cloud_list)}")
         
-
+        
         # fig = plt.figure()
         # fig.suptitle(f"Size of first cloud:{n1}, size of final cloud:{n2}")
         # plotA = fig.add_subplot(121, projection='3d')
