@@ -3,19 +3,17 @@ import pybullet as p
 import pybullet_data
 import numpy as np
 import matplotlib.pyplot as plt
-import pdb
 import json
 import cv2
-import copy
 import os.path as osp
 import os
-import time
+
 import glob
 import random
 
 import transformations
 from utils import enable_gravity, set_default_camera, in_collision, load_model, set_pose, set_quat, \
-        Pose, Point, get_pose, connect, wait_for_user, get_center_extent, sample_placement, \
+        Pose, Point, get_pose, get_center_extent, sample_placement, \
         random_placement, get_aabb, single_collision, rotate_quat
 from camera_functions import get_rays_np
 
@@ -52,10 +50,13 @@ def add_labels(seg_im, im, map_dict):
     
     return im
 
-def process_pybullet_image(img, image_width, image_height):
+def process_pybullet_image(img, image_width, image_height, onlyrgb=True):
 
     img_saveable = np.reshape(img, (image_width, image_height, 4))
-    img_saveable = np.clip(img_saveable, 0, 255).astype(np.uint8)
+    if onlyrgb:
+        img_saveable = np.clip(img_saveable[:,:,:-1], 0, 255).astype(np.uint8)
+    else:
+        img_saveable = np.clip(img_saveable, 0, 255).astype(np.uint8)
     return img_saveable
 
 class Scene(object):
@@ -270,6 +271,25 @@ class Scene(object):
 
         return process_pybullet_image(img, IMAGE_WIDTH, IMAGE_HEIGHT)
     
+    def raw_rgbd(self, viewMat=None, projMat=None):
+        """
+        Return the raw_rgbd image in the form of numpy arrays
+        (for PyTorch)
+        """
+        if viewMat is None:
+            viewMat = self.viewMatrix
+        if projMat is None:
+            projMat = self.projMatrix
+
+        _, _, rgb_img, depth_img, _ = p.getCameraImage(IMAGE_WIDTH, IMAGE_HEIGHT, viewMatrix=viewMat, projectionMatrix=projMat, renderer=p.ER_TINY_RENDERER)
+
+        # still need to reshape image
+        rgb_img = process_pybullet_image(rgb_img, IMAGE_WIDTH, IMAGE_HEIGHT)
+        # multiply depth_img by 255 so that torch.ToTensor() can handle the entire rgbd image
+        rgbd_img = np.stack(rgb_img, np.array(255*depth_img).reshape((IMAGE_WIDTH, IMAGE_HEIGHT,1)), axis=-1)
+
+        return rgbd_img
+
     def random_reset_object(self, obj_id):
         """
         Randomly reset an object's position and orientation.
@@ -288,6 +308,7 @@ class Scene(object):
         
         if vis:
             return self.take_snapshot()
+
 
 def parse_steps(data):
     blocks = {}
@@ -383,12 +404,3 @@ if __name__ == "__main__":
 
     with open("pointclouds_scene2.json", "w") as data:
         json.dump(objectPointCloud_dict2, data)
-
-    # print("first dict\n")
-    # for key in objectPointCloud_dict.keys():
-    #     print(len(objectPointCloud_dict[key]), '\n')
-
-    # print("second dict\n")
-    # for key in objectPointCloud_dict2.keys():
-    #     print(len(objectPointCloud_dict2[key]), '\n')
-
