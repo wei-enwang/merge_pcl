@@ -34,7 +34,7 @@ def resnet18_4d(model = models.resnet18(pretrained=True), new_in_channels=4, lat
 
 
 class hidden_lstm(nn.Module):
-    def __init__(self, input_size, output_size=512, num_layers=3, dropout=0., device="cuda"):
+    def __init__(self, input_size, output_size, num_layers=3, dropout=0., device="cuda"):
         """
         Inputs: 
         - `input_size`: an int representing the RNN input size.
@@ -124,7 +124,7 @@ class ShapeEncoder(nn.Module):
     Wrapper model for the entire process from RGB-D images to shape latent.
     The last node of the output is confidence value
     """
-    def __init__(self, latent_size=512, output_size=513, num_layers=3, dropout=0.):
+    def __init__(self, latent_size=512, output_size=129, num_layers=3, dropout=0.):
         super().__init__()
         self.resnet = resnet18_4d(latent_size=latent_size)
         self.rnn = hidden_lstm(latent_size, output_size=output_size,

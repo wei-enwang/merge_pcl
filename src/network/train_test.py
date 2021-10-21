@@ -6,7 +6,7 @@ from torch.optim import Adam
 
 import utils
 
-def train_loop(dataloader, model, loss_fn, optimizer=None, tar_inv_tsfm=None, device="cpu"):
+def train_loop(dataloader, model, loss_fn, optimizer=None, device="cpu"):
     size = len(dataloader.dataset)
     for X, y in dataloader:
         # Compute prediction and loss
@@ -23,8 +23,6 @@ def train_loop(dataloader, model, loss_fn, optimizer=None, tar_inv_tsfm=None, de
 
 
     pred = model(X)
-    if tar_inv_tsfm:
-        pred, y = tar_inv_tsfm(pred), tar_inv_tsfm(y)
 
     SBP_loss = loss_fn(pred[:,0], y[:,0]).item()
     DBP_loss = loss_fn(pred[:,1], y[:,1]).item()
@@ -78,7 +76,7 @@ def test_loop(dataloader, model, loss_fn, tar_inv_tsfm=None, device="cpu", vis=F
     return results/num_batches
 
 def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=None, 
-                      batch_size=128, epochs=200, tar_inv_tsfm=None,
+                      batch_size=128, epochs=200,
                       device="cpu", vis=False, img_dir=""):
     """
     Perform `epochs` loops of training and test the model once. Returns the final results of training 
@@ -110,16 +108,15 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
 
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
-        train_values = train_loop(train_dataloader, model, loss_fn, optimizer, tar_inv_tsfm=tar_inv_tsfm,device=device)
+        train_values = train_loop(train_dataloader, model, loss_fn, optimizer, device=device)
 
-    test_values = test_loop(test_dataloader, model, loss_fn, tar_inv_tsfm=tar_inv_tsfm, device=device, vis=vis, img_dir=img_dir)
+    test_values = test_loop(test_dataloader, model, loss_fn, device=device, vis=vis, img_dir=img_dir)
 
     return train_values, test_values
 
 
 def train_test_scheme(training_data, testing_data, model, loss_fn, optimizer=None, 
-                      batch_size=300, epochs=200, tar_inv_tsfm=None,
-                      device="cpu"):
+                      batch_size=300, epochs=200, device="cpu"):
     """
     Perform `epochs` loops of training and testing. The training and testing results of each epoch 
     are stored in `train_history` and `test_history`.
@@ -160,9 +157,9 @@ def train_test_scheme(training_data, testing_data, model, loss_fn, optimizer=Non
 
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
-        train_history[t,:] = train_loop(train_dataloader, model, loss_fn, optimizer, tar_inv_tsfm=tar_inv_tsfm,device=device)
+        train_history[t,:] = train_loop(train_dataloader, model, loss_fn, optimizer, device=device)
 
-        test_history[t,:] = test_loop(big_test_dataloader, model, loss_fn, tar_inv_tsfm=tar_inv_tsfm , device=device)
+        test_history[t,:] = test_loop(big_test_dataloader, model, loss_fn, device=device)
 
     for i in range(5):
         train_history[:,i] = utils.running_average(train_history[:,i])
@@ -231,7 +228,6 @@ def cross_validate_scheme(whole_dataset, model_class, loss_fn,
                                                    optimizer=optimizer, 
                                                    batch_size=batch_size, 
                                                    epochs=epochs,
-                                                   tar_inv_tsfm=tar_inv_tsfm,
                                                    device=device)
 
         train_results += train_values

@@ -1,4 +1,6 @@
 import torch
+import json
+import glob
 from torch.utils.data import Dataset
 import numpy as np
 
@@ -34,9 +36,3 @@ class rgbd_data(Dataset):
 
         return img, gt_latents
 
-
-def latent_generator(object):
-    """
-    Every object has a latent representation
-    """
-    pass

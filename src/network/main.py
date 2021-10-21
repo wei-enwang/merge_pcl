@@ -14,6 +14,7 @@ from train_test import cross_validate_scheme, train_full_test_once
 
 
 image_dir = "../data/imgs/"
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 assert device == "cuda"   # use gpu whenever you can!
 

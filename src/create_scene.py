@@ -14,20 +14,21 @@ import random
 import transformations
 from utils import enable_gravity, set_default_camera, in_collision, load_model, set_pose, set_quat, \
         Pose, Point, get_pose, get_center_extent, sample_placement, \
-        random_placement, get_aabb, single_collision, rotate_quat
+        random_placement, get_aabb, single_collision, rotate_quat, stable_z, quat_from_euler
 from camera_functions import get_rays_np
 
 
 yaw = 160
 pitch = -25
-distance = 1.5
+distance = 2
 
 FLOOR_MODEL = "short_floor.urdf"
 BASE_URL = os.path.abspath(os.path.dirname(__file__))
 object_set = sorted(glob.glob("models/daily_object/*/model_meshlabserver_normalized.obj"))
 
-IMAGE_WIDTH = 2048
-IMAGE_HEIGHT = 2048
+IMAGE_WIDTH = 512
+IMAGE_HEIGHT = 512
+CIRCULAR_LIMITS = -np.pi, np.pi
 
 def add_labels(seg_im, im, map_dict):
     idxs = np.unique(seg_im)
@@ -206,12 +207,35 @@ class Scene(object):
         
         if vis:
             return self.take_snapshot()
-    
-    def set_view_matrix(self, distance_, yaw_, pitch_, roll_):
-        self.viewMatrix = p.computeViewMatrixFromYawPitchRoll([0, 0, 0], distance_, yaw_, pitch_, roll_, 2)
 
-    def set_random_view_matrix(self, distance_=distance):
-        yaw_ = random.randint(0, 360)
+
+    def place_objects_no_table(self, objects, size=2, vis=False):
+        if self.table_ready:
+            assert "This method expcts no table."
+
+        coords = np.random.uniform(-size/2, size/2, (len(objects), 2))
+
+        for i,item in enumerate(objects):
+            obj_id = p.loadURDF(item, globalScaling=0.3, useFixedBase=True)
+            
+            z = stable_z(obj_id, self.floor)
+            set_pose(obj_id, (np.array([coords[i, 0], coords[i, 1], z]),
+                              quat_from_euler([0,0,np.random.uniform(*CIRCULAR_LIMITS)])))
+
+            while single_collision(obj_id):
+                coords[i] = np.random.uniform(-size/2, size/2, (2,))
+                set_pose(obj_id, (np.array([coords[i, 0], coords[i, 1], z]),
+                                  quat_from_euler([0,0,np.random.uniform(*CIRCULAR_LIMITS)])))
+
+            self.objects.append(obj_id)
+        if vis:
+            return self.take_snapshot()
+
+
+    def set_view_matrix(self, distance_, yaw_, pitch_, roll_):
+        self.viewMatrix = p.computeViewMatrixFromYawPitchRoll([0, 0, 0.1], distance_, yaw_, pitch_, roll_, 2)
+
+    def set_random_view_matrix(self, distance_=distance, yaw_=yaw):
         pitch_ = random.randint(-30, -10)
         self.set_view_matrix(distance_=distance_, yaw_=yaw_, pitch_=pitch_, roll_=0)
 
@@ -286,7 +310,7 @@ class Scene(object):
         # still need to reshape image
         rgb_img = process_pybullet_image(rgb_img, IMAGE_WIDTH, IMAGE_HEIGHT)
         # multiply depth_img by 255 so that torch.ToTensor() can handle the entire rgbd image
-        rgbd_img = np.stack(rgb_img, np.array(255*depth_img).reshape((IMAGE_WIDTH, IMAGE_HEIGHT,1)), axis=-1)
+        rgbd_img = np.concatenate((rgb_img, np.array(255*depth_img).reshape((IMAGE_WIDTH, IMAGE_HEIGHT,1))), axis=-1)
 
         return rgbd_img
 
@@ -308,6 +332,12 @@ class Scene(object):
         
         if vis:
             return self.take_snapshot()
+
+    def reset_scene(self, new_objects=None):
+        for obj_id in self.objects:
+            p.removeBody(obj_id)
+        if new_objects is not None:
+            self.place_objects_no_table(new_objects)
 
 
 def parse_steps(data):
