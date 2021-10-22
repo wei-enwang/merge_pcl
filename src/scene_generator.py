@@ -2,6 +2,7 @@ import numpy as np
 import os.path
 import glob
 import json
+import pickle
 from create_scene import Scene
 from imageio import imwrite
 
@@ -32,7 +33,7 @@ def all_latent_generator(objects, data_dir, latent_size=128, save=True):
 
 save_data_dir = "data/imgs/"
 save_latent_dir = "data/latents/"
-num_scenes = 10000
+num_scenes = 10
 scene = Scene()
 
 object_name_list = ['basket', 'chair', 'chest', 'fridge', 'sofa', 'plant', 'piano', 'guitar', 'toilet', 
@@ -45,6 +46,8 @@ for name in object_name_list:
 # Generate latents for the first time
 all_latent_generator(obj_list, save_latent_dir)
 
+with open(save_latent_dir+"trial_latents.json", "r") as f:
+    current_latent_dict = json.load(f)
 for i in range(num_scenes):
 
     # Select number of objects in this scene
@@ -54,7 +57,7 @@ for i in range(num_scenes):
     # Make new view angle (pitch)
     scene.set_random_view_matrix()
 
-    # test_img = scene.place_objects_no_table(used_objs, size=1.5, vis=True)    # debug
+    scene.place_objects_no_table(used_objs, size=1.5, vis=False)
     
     # Get new scene
     scene_rgbd_img = scene.raw_rgbd()
@@ -63,5 +66,13 @@ for i in range(num_scenes):
     # imwrite("test"+str(i)+".png", test_img)
     # print(f"The shape of rgbd image: {scene_rgbd_img.shape}") 
 
+    # save rgbd image(data)
     np.save(save_data_dir+str(i)+'.npy', scene_rgbd_img)
+
+    # save object latents (label)
+    latents = []
+    for obj in used_objs:
+        latents.append(current_latent_dict[obj])
+    np.save(save_latent_dir+str(i)+'.npy', np.array(latents))
+
     scene.reset_scene()

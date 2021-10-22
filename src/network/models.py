@@ -135,9 +135,12 @@ class ShapeEncoder(nn.Module):
         latents = self.rnn.forward(hidden)
         return latents
     
-def loss_fn(z, gt, conf=None):
-    assert z.shape == gt.shape
-    assert gt.shape[0] == conf.shape[0]
+def loss_fn(z, gt_latent):
+    conf = z[:,-1:]
+    out_latent = z[:,:-1]
+    
+    assert z.shape[1] == gt_latent.shape[1]
+    assert gt_latent.shape[0] == conf.shape[0]
 
     loss_1 = z[:,:,None]
     pass

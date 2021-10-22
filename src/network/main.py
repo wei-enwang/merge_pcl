@@ -14,6 +14,7 @@ from train_test import cross_validate_scheme, train_full_test_once
 
 
 image_dir = "../data/imgs/"
+latent_dir = "../data/latents/"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 assert device == "cuda"   # use gpu whenever you can!
@@ -32,19 +33,24 @@ torch.cuda.manual_seed(seed)
 
 latent_model = models.resnet_4d()
 
-# TODO: input = pybullet rgb-d segmented images, dataloader stuff
+
 data_paths = []
+latent_paths = []
 for data_path in glob.glob(image_dir + '/*'):
     data_paths.append(glob.glob(data_path + '/*'))
+for latent_path in glob.glob(latent_dir + '/*'):
+    latent_paths.append(glob.glob(latent_path + '/*'))
     
-np.random.shuffle(data_paths)
-print('train_image_path example: ', data_paths[0])
-
+# DONT shuffle the paths because the labels and x are stored in different directories
 # Randomly split images in to training and testing datasets. 
 # Can also use cross_validate_scheme
 n = len(data_paths)
-train_image_paths = data_paths[:int(train_test_split*n)]
-test_image_paths = data_paths[int(train_test_split*n):]
+mask = np.random.permutation(n)
+train_image_paths = data_paths[mask[:int(train_test_split*n)]]
+test_image_paths = data_paths[mask[int(train_test_split*n):]]
+
+train_latent_paths = latent_paths[mask[:int(train_test_split*n)]]
+test_latent_paths = latent_paths[mask[int(train_test_split*n):]]
 
 # Image preprocessing
 preprocess = transforms.Compose([
@@ -54,16 +60,15 @@ preprocess = transforms.Compose([
     # transforms.Normalize(mean=[0.485, 0.456, 0.406, None], std=[0.229, 0.224, 0.225, None]),
 ])
 
-training_data = rgbd_data(train_image_paths)
-testing_data = rgbd_data(test_image_paths)
+training_data = rgbd_data(train_image_paths, train_latent_paths)
+testing_data = rgbd_data(test_image_paths, test_latent_paths)
 
 train_dataloader = DataLoader(training_data, batch_size=batch_size, num_workers=8, shuffle=True)
 test_dataloader = DataLoader(testing_data, batch_size=batch_size, num_workers=8, shuffle=False)
 
 model = models.ShapeEncoder().to(device)
-loss_function = nn.NLLLoss(reduction="sum")
+loss_function = models.loss_fn
 optim = Adam(model.parameters(), lr=learning_rate)
-
 
 
 train_values, test_values = train_full_test_once(train_dataloader, test_dataloader, model, loss_function,
@@ -71,6 +76,5 @@ train_values, test_values = train_full_test_once(train_dataloader, test_dataload
                     batch_size=batch_size,
                     epochs=epochs,
                     tar_inv_tsfm=training_data.target_inv_transform,
-                    device=device,
-                    img_dir=results_dir)
+                    device=device)
 
