@@ -33,7 +33,7 @@ def all_latent_generator(objects, data_dir, latent_size=128, save=True):
 
 save_data_dir = "data/imgs/"
 save_latent_dir = "data/latents/"
-num_scenes = 10
+num_scenes = 10000
 scene = Scene()
 
 object_name_list = ['basket', 'chair', 'chest', 'fridge', 'sofa', 'plant', 'piano', 'guitar', 'toilet', 
