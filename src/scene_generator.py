@@ -2,7 +2,6 @@ import numpy as np
 import os.path
 import glob
 import json
-import pickle
 from create_scene import Scene
 from imageio import imwrite
 

@@ -14,7 +14,7 @@ import random
 import transformations
 from utils import enable_gravity, set_default_camera, in_collision, load_model, set_pose, set_quat, \
         Pose, Point, get_pose, get_center_extent, sample_placement, \
-        random_placement, get_aabb, single_collision, rotate_quat, stable_z, quat_from_euler
+        random_placement, get_aabb, single_collision, rotate_quat, stable_z, quat_from_euler, remove_body
 from camera_functions import get_rays_np
 
 
@@ -335,7 +335,7 @@ class Scene(object):
 
     def reset_scene(self, new_objects=None):
         for obj_id in self.objects:
-            p.removeBody(obj_id)
+            remove_body(obj_id)
         if new_objects is not None:
             self.place_objects_no_table(new_objects)
 

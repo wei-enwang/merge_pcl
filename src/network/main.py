@@ -22,7 +22,8 @@ assert device == "cuda"   # use gpu whenever you can!
 # hyperparameters
 train_test_split = 0.8
 learning_rate = 1e-4
-batch_size = 128
+batch_size = 32
+seq_len = 10
 epochs = 20
 
 
@@ -60,14 +61,15 @@ preprocess = transforms.Compose([
     # transforms.Normalize(mean=[0.485, 0.456, 0.406, None], std=[0.229, 0.224, 0.225, None]),
 ])
 
-training_data = rgbd_data(train_image_paths, train_latent_paths)
-testing_data = rgbd_data(test_image_paths, test_latent_paths)
+training_data = rgbd_data(train_image_paths, train_latent_paths, transform=preprocess)
+testing_data = rgbd_data(test_image_paths, test_latent_paths, transform=preprocess)
 
-train_dataloader = DataLoader(training_data, batch_size=batch_size, num_workers=8, shuffle=True)
-test_dataloader = DataLoader(testing_data, batch_size=batch_size, num_workers=8, shuffle=False)
+# transform images into batches of sequences
+train_dataloader = DataLoader(training_data, batch_size=batch_size*seq_len, num_workers=8, shuffle=True)
+test_dataloader = DataLoader(testing_data, batch_size=seq_len, num_workers=8, shuffle=False)
 
 model = models.ShapeEncoder().to(device)
-loss_function = models.loss_fn
+loss_function = models.crossMLEloss().to(device)
 optim = Adam(model.parameters(), lr=learning_rate)
 
 
@@ -75,6 +77,5 @@ train_values, test_values = train_full_test_once(train_dataloader, test_dataload
                     optimizer=optim,
                     batch_size=batch_size,
                     epochs=epochs,
-                    tar_inv_tsfm=training_data.target_inv_transform,
                     device=device)
 

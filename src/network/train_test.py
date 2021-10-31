@@ -3,10 +3,15 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Adam
+from tqdm import tqdm
 
 import utils
 
-def train_loop(dataloader, model, loss_fn, optimizer=None, device="cpu"):
+def train_loop(dataloader, model, loss_fn, optimizer, device):
+    """
+    Perform one epoch of training through the dataset.
+
+    """
     size = len(dataloader.dataset)
     for X, y in dataloader:
         # Compute prediction and loss
@@ -18,43 +23,22 @@ def train_loop(dataloader, model, loss_fn, optimizer=None, device="cpu"):
         # Backpropagation
         optimizer.zero_grad()
         loss.backward()
-        if optimizer:
-            optimizer.step()
+        optimizer.step()
 
 
-    pred = model(X)
-
-    SBP_loss = loss_fn(pred[:,0], y[:,0]).item()
-    DBP_loss = loss_fn(pred[:,1], y[:,1]).item()
-
-    MAE = nn.L1Loss()(pred[:,0], y[:,0]).item()
-    mean = np.mean((pred - y)[:,0].tolist())
-    std = np.std((pred-y)[:,0].tolist())
-
-    print(f"SBP Training loss: {SBP_loss:>5f}")
-    print(f"DBP Training loss: {DBP_loss:>5f}")
+    print(f"SBP Training loss: {loss:>5f}")
     
-    return np.array([SBP_loss, DBP_loss, MAE, mean, std])
+    return loss
 
 
-def test_loop(dataloader, model, loss_fn, tar_inv_tsfm=None, device="cpu", vis=False, img_dir=""):
+def test_loop(dataloader, model, loss_fn, device="cuda", vis=False, img_dir=""):
 
     num_batches = len(dataloader)
-
-    SBP_test_loss = 0
-    DBP_test_loss = 0
-
-    MAE = 0
-    mean = 0
-    std = 0
 
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
-
-            if tar_inv_tsfm:
-                pred, y = tar_inv_tsfm(pred), tar_inv_tsfm(y)
 
             SBP_test_loss += loss_fn(pred[:,0], y[:,0]).item()
             DBP_test_loss += loss_fn(pred[:,1], y[:,1]).item()
@@ -76,7 +60,7 @@ def test_loop(dataloader, model, loss_fn, tar_inv_tsfm=None, device="cpu", vis=F
     return results/num_batches
 
 def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=None, 
-                      batch_size=128, epochs=200,
+                      batch_size=32, epochs=200,
                       device="cpu", vis=False, img_dir=""):
     """
     Perform `epochs` loops of training and test the model once. Returns the final results of training 
@@ -106,7 +90,7 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
     """    
 
 
-    for t in range(epochs):
+    for t in tqdm(range(epochs)):
         print(f"Epoch {t+1}\n-------------------------------")
         train_values = train_loop(train_dataloader, model, loss_fn, optimizer, device=device)
 
@@ -155,7 +139,7 @@ def train_test_scheme(training_data, testing_data, model, loss_fn, optimizer=Non
     train_history = np.zeros((epochs, 5))
     test_history = np.zeros((epochs, 5))
 
-    for t in range(epochs):
+    for t in tqdm(range(epochs)):
         print(f"Epoch {t+1}\n-------------------------------")
         train_history[t,:] = train_loop(train_dataloader, model, loss_fn, optimizer, device=device)
 

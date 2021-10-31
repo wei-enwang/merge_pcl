@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn
 from torchvision import models
@@ -34,7 +35,7 @@ def resnet18_4d(model = models.resnet18(pretrained=True), new_in_channels=4, lat
 
 
 class hidden_lstm(nn.Module):
-    def __init__(self, input_size, output_size, num_layers=3, dropout=0., device="cuda"):
+    def __init__(self, input_size, output_size, num_layers=3, dropout=0.):
         """
         Inputs: 
         - `input_size`: an int representing the RNN input size.
@@ -46,35 +47,11 @@ class hidden_lstm(nn.Module):
         super(hidden_lstm, self).__init__()
         self.rnn = nn.LSTM(input_size, output_size, num_layers=num_layers, batch_first=True,
                         dropout=dropout, bidirectional=False)
-        self.device = device
+        self.num_layers = num_layers
         self.output_size = output_size
-    
-
-    def forward_step(self, input_latent, hidden):
-        """Helper function for forward below:
-        Perform a single decoder step.
-
-        Inputs:
-        - `input_latent`: a 3d-tensor of shape (batch_size, 1, input_size)
-            representing the padded embedded word vectors at this step in training
-        - `hidden`: a 3d-tensor of shape (1, batch_size, output_size) representing
-            the current hidden state.
-
-        Returns:
-        - `hidden`: a 3d-tensor of shape (1, batch_size, hidden_size)
-            representing the current decoder hidden state.
-        - `pre_output`: a 3d-tensor of shape (batch_size, 1, hidden_size)
-            representing the total decoder output for one step
-        """
-
-        cur_output, hidden = self.rnn(input_latent, hidden)
-        
-        # cur_output, _ = torch.max(cur_output, dim=1, keepdim=True)
-
-        return hidden, cur_output
 
 
-    def forward(self, inputs, hidden=None, max_len=None):
+    def forward(self, inputs):
         """
         Inputs:
         - `inputs`: a 3d-tensor of shape (batch_size, num_scenes, input_size)
@@ -82,41 +59,16 @@ class hidden_lstm(nn.Module):
 
         Returns:
         - `outputs`: a 3d-tensor of shape
-            (batch_size, num_scenes, output_size).
+            (batch_size, num_scenes, output_size(default=10*129)).
 
         """
         batch_size = inputs.shape[0]
-        # The maximum number of steps to unroll the RNN.
-        if max_len is None:
-            max_len = inputs.size(1)
 
-        # Initialize decoder hidden state.
-        if hidden is None:
-            hidden = self.init_hidden(batch_size)
+        seq_len = inputs.size(1)
 
-
-        outputs = []
-        for i in range(max_len):
-            hidden, output = self.forward_step(inputs[:,i:i+1,:], hidden)
-            outputs.append(output[:,0,:])
+        output = self.rnn(inputs)
         
-        outputs = torch.stack(outputs, dim=1)
-
-        return outputs
-
-    
-    def init_hidden(self, batch_size):
-        """
-        Input:
-            - `batch_size`: a positive integer
-
-        Returns:
-            - `hidden`: a 2d-tensor of shape (batch_size, hidden_size) representing
-                the initial hidden state of the RNN
-        """
-        # Use to initialize hidden state everytime before running a sentence.
-        hidden = torch.zeros(batch_size, self.output_size).to(self.device)
-        return hidden
+        return output.reshape((batch_size, seq_len, 10, 129))
 
 
 class ShapeEncoder(nn.Module):
@@ -124,7 +76,7 @@ class ShapeEncoder(nn.Module):
     Wrapper model for the entire process from RGB-D images to shape latent.
     The last node of the output is confidence value
     """
-    def __init__(self, latent_size=512, output_size=129, num_layers=3, dropout=0.):
+    def __init__(self, latent_size=128, output_size=1290, num_layers=3, dropout=0.):
         super().__init__()
         self.resnet = resnet18_4d(latent_size=latent_size)
         self.rnn = hidden_lstm(latent_size, output_size=output_size,
@@ -135,12 +87,33 @@ class ShapeEncoder(nn.Module):
         latents = self.rnn.forward(hidden)
         return latents
     
-def loss_fn(z, gt_latent):
-    conf = z[:,-1:]
-    out_latent = z[:,:-1]
-    
-    assert z.shape[1] == gt_latent.shape[1]
-    assert gt_latent.shape[0] == conf.shape[0]
 
-    loss_1 = z[:,:,None]
-    pass
+class crossMSEloss(nn.Module):
+    """
+    The loss function for this model.
+
+    """
+    def __init__(self, weight=None, size_average=True):
+        super().__init__()
+    
+
+    def forward(self, inputs, targets):
+        """
+        inputs (batch_size, seq_len, num_preds, latent_size): The latents predicted by the LSTM network
+        targets (batch_size, seq_len, num_objects, latent_size): The ground truth latents
+        """
+        conf = inputs[...,-1]
+        preds = inputs[...,:-1]
+
+        # check latent size matches
+        assert targets.shape[-1] == preds.shape[-1]
+        assert inputs.shape == targets.shape
+        
+        # dimension of the following term is (batch_size, seq_len, num_preds, num_objects)
+        l2norm = torch.norm(preds[:,:,:,None,:] - targets[:,:,None,:,:], dim=-1)
+
+        loss = torch.sum(conf*torch.min(l2norm, dim=-1)[0], dim=-1)+ \
+               torch.sum(torch.min(1/conf[...,None]*l2norm, dim=2)[0], dim=-1)
+
+        return loss
+
