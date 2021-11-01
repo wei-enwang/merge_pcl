@@ -65,8 +65,8 @@ training_data = rgbd_data(train_image_paths, train_latent_paths, transform=prepr
 testing_data = rgbd_data(test_image_paths, test_latent_paths, transform=preprocess)
 
 # transform images into batches of sequences
-train_dataloader = DataLoader(training_data, batch_size=batch_size*seq_len, num_workers=8, shuffle=True)
-test_dataloader = DataLoader(testing_data, batch_size=seq_len, num_workers=8, shuffle=False)
+train_dataloader = DataLoader(training_data, batch_size=batch_size, num_workers=8, shuffle=True)
+test_dataloader = DataLoader(testing_data, batch_size=batch_size, num_workers=8, shuffle=False)
 
 model = models.ShapeEncoder().to(device)
 loss_function = models.crossMLEloss().to(device)

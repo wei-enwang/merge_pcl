@@ -5,14 +5,15 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Adam
 from tqdm import tqdm
 
-import utils
+import misc
 
 def train_loop(dataloader, model, loss_fn, optimizer, device):
     """
     Perform one epoch of training through the dataset.
 
     """
-    size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    total_loss = 0
     for X, y in dataloader:
         # Compute prediction and loss
         X, y = X.to(device), y.to(device)
@@ -24,44 +25,28 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        total_loss += loss.item()
 
-
-    print(f"SBP Training loss: {loss:>5f}")
+    # print(f"Training loss: {total_loss/num_batches:>5f}")
     
-    return loss
+    return total_loss/num_batches
 
 
-def test_loop(dataloader, model, loss_fn, device="cuda", vis=False, img_dir=""):
+def test_loop(dataloader, model, loss_fn, device):
 
     num_batches = len(dataloader)
-
+    total_loss = 0
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
 
-            SBP_test_loss += loss_fn(pred[:,0], y[:,0]).item()
-            DBP_test_loss += loss_fn(pred[:,1], y[:,1]).item()
+            total_loss += loss_fn(pred, y).item()
 
-            MAE += nn.L1Loss()(pred[:,0], y[:,0]).item()
-            mean += np.mean((pred - y)[:,0].tolist())
-            std += np.std((pred-y)[:,0].tolist())
-
-    results = np.array([SBP_test_loss, DBP_test_loss, MAE, mean, std])
-
-    print(f"Test Error:")
-    print(f"SBP loss: {SBP_test_loss/num_batches:>5f}")
-    print(f"DBP loss: {DBP_test_loss/num_batches:>5f}\n")
-
-    if vis:
-        utils.plot_test_distr(y[:,0].tolist(), pred[:,0].tolist(),
-                              title="Predicted SBP vs True SBP", filename=img_dir+"predict_values")
-
-    return results/num_batches
+    return total_loss/num_batches
 
 def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=None, 
-                      batch_size=32, epochs=200,
-                      device="cpu", vis=False, img_dir=""):
+                         device="cuda", epochs=200, vis=False, print_every=5, img_dir=""):
     """
     Perform `epochs` loops of training and test the model once. Returns the final results of training 
     and testing.
@@ -77,10 +62,14 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
             Loss function of the model.
         optimizer:
             Optimizer of the model.
-        batch_size (int):
-            The size of samples fed into the network in each training iteration.
+        device:
+            Device this model is trained on.
         epochs (int):
             The number of rounds of which the dataset is fed into the network.
+        print_every (int):
+            Frequency to print training loss.
+        img_dir (string):
+            Plots will be saved under this directory
 
     Returns:
         train_values (ndarray of shape (n_params, )):
@@ -89,14 +78,19 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
             Testing results.
     """    
 
-
+    loss_list = []
     for t in tqdm(range(epochs)):
-        print(f"Epoch {t+1}\n-------------------------------")
-        train_values = train_loop(train_dataloader, model, loss_fn, optimizer, device=device)
+        train_loss = train_loop(train_dataloader, model, loss_fn, optimizer, device)
+        loss_list.append(train_loss)
+        if t % print_every == 0:
+            print(f"Epoch {t}\n-------------------------------")
+            print(f"Training loss: {train_loss:>5f}")
 
-    test_values = test_loop(test_dataloader, model, loss_fn, device=device, vis=vis, img_dir=img_dir)
+    misc.plot_loss(epochs, loss_list, title="baseline model(training)", filename=img_dir+"train_loss")
+    test_loss = test_loop(test_dataloader, model, loss_fn, device)
+    print(f"Final testing loss: {test_loss:>5f}")
 
-    return train_values, test_values
+    return train_loss, test_loss
 
 
 def train_test_scheme(training_data, testing_data, model, loss_fn, optimizer=None, 
@@ -145,9 +139,9 @@ def train_test_scheme(training_data, testing_data, model, loss_fn, optimizer=Non
 
         test_history[t,:] = test_loop(big_test_dataloader, model, loss_fn, device=device)
 
-    for i in range(5):
-        train_history[:,i] = utils.running_average(train_history[:,i])
-        test_history[:,i] = utils.running_average(test_history[:,i])
+    # for i in range(5):
+    #     train_history[:,i] = utils.running_average(train_history[:,i])
+    #     test_history[:,i] = utils.running_average(test_history[:,i])
 
     return train_history, test_history
 
