@@ -33,9 +33,6 @@ np.random.seed(seed)
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 
-latent_model = models.resnet_4d()
-
-
 data_paths = []
 latent_paths = []
 for data_path in glob.glob(image_dir + '/*'):
