@@ -10,11 +10,12 @@ import glob
 
 import models
 from dataset import rgbd_data
-from train_test import cross_validate_scheme, train_full_test_once
+from train_test import train_full_test_once
 
 
 image_dir = "../data/imgs/"
 latent_dir = "../data/latents/"
+stats_dir = "./results/"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 assert device == "cuda"   # use gpu whenever you can!
@@ -73,9 +74,9 @@ loss_function = models.crossMLEloss().to(device)
 optim = Adam(model.parameters(), lr=learning_rate)
 
 
-train_values, test_values = train_full_test_once(train_dataloader, test_dataloader, model, loss_function,
-                    optimizer=optim,
-                    batch_size=batch_size,
+train_loss, test_loss = train_full_test_once(train_dataloader, test_dataloader, model, loss_function,
+                    optim,
+                    device,
                     epochs=epochs,
-                    device=device)
-
+                    vis=True,
+                    img_dir=stats_dir)

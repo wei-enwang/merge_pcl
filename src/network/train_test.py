@@ -45,7 +45,7 @@ def test_loop(dataloader, model, loss_fn, device):
 
     return total_loss/num_batches
 
-def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=None, 
+def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer, 
                          device="cuda", epochs=200, vis=False, print_every=5, img_dir=""):
     """
     Perform `epochs` loops of training and test the model once. Returns the final results of training 
