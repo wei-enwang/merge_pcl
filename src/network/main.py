@@ -80,3 +80,5 @@ train_loss, test_loss = train_full_test_once(train_dataloader, test_dataloader, 
                     epochs=epochs,
                     vis=True,
                     img_dir=stats_dir)
+
+torch.save(model.state_dict(), stats_dir+"base_randlat.pt")
