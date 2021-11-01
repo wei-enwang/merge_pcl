@@ -18,7 +18,7 @@ latent_dir = "../data/latents/"
 stats_dir = "./results/"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-assert device == "cuda"   # use gpu whenever you can!
+# assert device == "cuda"   # use gpu whenever you can!
 
 # hyperparameters
 train_test_split = 0.8
@@ -43,13 +43,8 @@ for latent_path in glob.glob(latent_dir + '/*'):
 # DONT shuffle the paths because the labels and x are stored in different directories
 # Randomly split images in to training and testing datasets. 
 # Can also use cross_validate_scheme
-n = len(data_paths)
+n = len(data_paths/seq_len)
 mask = np.random.permutation(n)
-train_image_paths = data_paths[mask[:int(train_test_split*n)]]
-test_image_paths = data_paths[mask[int(train_test_split*n):]]
-
-train_latent_paths = latent_paths[mask[:int(train_test_split*n)]]
-test_latent_paths = latent_paths[mask[int(train_test_split*n):]]
 
 # Image preprocessing
 preprocess = transforms.Compose([
@@ -59,8 +54,11 @@ preprocess = transforms.Compose([
     # transforms.Normalize(mean=[0.485, 0.456, 0.406, None], std=[0.229, 0.224, 0.225, None]),
 ])
 
-training_data = rgbd_data(train_image_paths, train_latent_paths, transform=preprocess)
-testing_data = rgbd_data(test_image_paths, test_latent_paths, transform=preprocess)
+# training and testing data are separated by mask
+training_data = rgbd_data(data_paths, latent_paths, 
+                          transform=preprocess, idx_mask=mask[:int(train_test_split*n)])
+testing_data = rgbd_data(data_paths, latent_paths, 
+                         transform=preprocess, idx_mask=mask[int(train_test_split*n):])
 
 # transform images into batches of sequences
 train_dataloader = DataLoader(training_data, batch_size=batch_size, num_workers=8, shuffle=True)

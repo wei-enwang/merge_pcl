@@ -17,7 +17,7 @@ class rgbd_data(Dataset):
 
     """
 
-    def __init__(self, data_paths, latent_paths, seq_len=10, transform=None):
+    def __init__(self, data_paths, latent_paths, seq_len=10, transform=None, idx_mask=None):
 
         self.data_paths = data_paths
         self.latent_paths = latent_paths
@@ -28,6 +28,8 @@ class rgbd_data(Dataset):
         # For our ease of implementation, suppose number of images is divisible by the length of sequences
         assert len(data_paths) % seq_len == 0
         self.idxs = np.arange(len(data_paths)).reshape((-1,seq_len))
+        if idx_mask:
+            self.idxs = self.idxs[idx_mask,:]
 
     def __len__(self):
         assert len(self.data_paths) == len(self.latent_paths)
