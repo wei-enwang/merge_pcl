@@ -35,15 +35,15 @@ torch.cuda.manual_seed(seed)
 
 data_paths = []
 latent_paths = []
-for data_path in glob.glob(image_dir + '/*'):
+for data_path in glob.glob(image_dir + '/*.npy'):
     data_paths.append(glob.glob(data_path + '/*'))
-for latent_path in glob.glob(latent_dir + '/*'):
+for latent_path in glob.glob(latent_dir + '/*.npy'):
     latent_paths.append(glob.glob(latent_path + '/*'))
     
 # DONT shuffle the paths because the labels and x are stored in different directories
 # Randomly split images in to training and testing datasets. 
 # Can also use cross_validate_scheme
-n = len(data_paths/seq_len)
+n = len(data_paths)//seq_len
 mask = np.random.permutation(n)
 
 # Image preprocessing
@@ -65,7 +65,7 @@ train_dataloader = DataLoader(training_data, batch_size=batch_size, num_workers=
 test_dataloader = DataLoader(testing_data, batch_size=batch_size, num_workers=8, shuffle=False)
 
 model = models.ShapeEncoder().to(device)
-loss_function = models.crossMLEloss().to(device)
+loss_function = models.crossMSEloss().to(device)
 optim = Adam(model.parameters(), lr=learning_rate)
 
 

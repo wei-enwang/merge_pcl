@@ -6,7 +6,7 @@ from torchvision import models
 def resnet18_4d(model = models.resnet18(pretrained=True), new_in_channels=4, latent_size=512):
 
     layer = model.conv1
-            
+    layer.requires_grad = False
     # Creating new Conv2d layer
     new_layer = nn.Conv2d(in_channels=new_in_channels, 
                     out_channels=layer.out_channels, 
@@ -18,6 +18,7 @@ def resnet18_4d(model = models.resnet18(pretrained=True), new_in_channels=4, lat
     copy_weights = 0 # Here will initialize the weights from new channel with the red channel weights
 
     # Copying the weights from the old to the new layer
+    new_layer.weight.requires_grad = False
     new_layer.weight[:, :layer.in_channels, :, :] = layer.weight.clone()
 
     #Copying the weights of the `copy_weights` channel of the old layer to the extra channels of the new layer
@@ -27,6 +28,7 @@ def resnet18_4d(model = models.resnet18(pretrained=True), new_in_channels=4, lat
     new_layer.weight = nn.Parameter(new_layer.weight)
 
     model.conv1 = new_layer
+    model.conv1.weight.requires_grad = True
 
     # modify output layer
     model.fc = nn.Linear(512, latent_size)
