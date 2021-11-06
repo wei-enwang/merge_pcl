@@ -37,6 +37,7 @@ scene = Scene()
 
 object_name_list = ['basket', 'chair', 'chest', 'fridge', 'sofa', 'plant', 'piano', 'guitar', 'toilet', 
 'floor_lamp']
+max_obj_num = len(object_name_list)
 
 obj_list = []
 for name in object_name_list:
@@ -69,9 +70,17 @@ for i in range(num_scenes):
     np.save(save_data_dir+str(i)+'.npy', scene_rgbd_img)
 
     # save object latents (label)
+    # to allow vectorize operations in during PyTorch training, 
+    # duplicate the number of latents in ground truth so that the dimensions stays the same
     latents = []
+    
     for obj in used_objs:
         latents.append(current_latent_dict[obj])
+    
+    for _ in range(max_obj_num-len(latents)):
+        latents.append(current_latent_dict[used_objs[-1]])
+
+    assert len(latents) == max_obj_num
     np.save(save_latent_dir+str(i)+'.npy', np.array(latents))
 
     scene.reset_scene()

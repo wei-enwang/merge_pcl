@@ -27,6 +27,9 @@ batch_size = 32
 seq_len = 10
 epochs = 20
 
+# scene settings
+num_objects = 10
+
 
 seed = 42
 np.random.seed(seed)
@@ -35,10 +38,10 @@ torch.cuda.manual_seed(seed)
 
 data_paths = []
 latent_paths = []
-for data_path in glob.glob(image_dir + '/*.npy'):
-    data_paths.append(glob.glob(data_path + '/*'))
-for latent_path in glob.glob(latent_dir + '/*.npy'):
-    latent_paths.append(glob.glob(latent_path + '/*'))
+for data_path in glob.glob(image_dir + '*.npy'):
+    data_paths.append(glob.glob(data_path + '*')[0])
+for latent_path in glob.glob(latent_dir + '*.npy'):
+    latent_paths.append(glob.glob(latent_path + '*')[0])
     
 # DONT shuffle the paths because the labels and x are stored in different directories
 # Randomly split images in to training and testing datasets. 
@@ -48,21 +51,23 @@ mask = np.random.permutation(n)
 
 # Image preprocessing
 preprocess = transforms.Compose([
+    transforms.ToTensor(),
     transforms.Resize(256),
     transforms.CenterCrop(224),
-    transforms.ToTensor()
+    
     # transforms.Normalize(mean=[0.485, 0.456, 0.406, None], std=[0.229, 0.224, 0.225, None]),
 ])
 
 # training and testing data are separated by mask
+# print(data_paths)
 training_data = rgbd_data(data_paths, latent_paths, 
                           transform=preprocess, idx_mask=mask[:int(train_test_split*n)])
 testing_data = rgbd_data(data_paths, latent_paths, 
                          transform=preprocess, idx_mask=mask[int(train_test_split*n):])
 
 # transform images into batches of sequences
-train_dataloader = DataLoader(training_data, batch_size=batch_size, num_workers=8, shuffle=True)
-test_dataloader = DataLoader(testing_data, batch_size=batch_size, num_workers=8, shuffle=False)
+train_dataloader = DataLoader(training_data, batch_size=batch_size,  shuffle=True)
+test_dataloader = DataLoader(testing_data, batch_size=batch_size,  shuffle=False)
 
 model = models.ShapeEncoder().to(device)
 loss_function = models.crossMSEloss().to(device)
