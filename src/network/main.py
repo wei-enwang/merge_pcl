@@ -37,12 +37,8 @@ np.random.seed(seed)
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 
-data_paths = []
-latent_paths = []
-for data_path in glob.glob(image_dir + '*.npy'):
-    data_paths.append(glob.glob(data_path + '*')[0])
-for latent_path in glob.glob(latent_dir + '*.npy'):
-    latent_paths.append(glob.glob(latent_path + '*')[0])
+data_paths = sorted(glob.glob(image_dir + '*.npy'))
+latent_paths = sorted(glob.glob(latent_dir + '*.npy'))
     
 # DONT shuffle the paths because the labels and x are stored in different directories
 # Randomly split images in to training and testing datasets. 
@@ -67,6 +63,7 @@ testing_data = rgbd_data(data_paths, latent_paths,
                          transform=preprocess, idx_mask=mask[int(train_test_split*n):])
 
 # transform images into batches of sequences
+# TODO: change num_workers to 8 when running on GPU
 train_dataloader = DataLoader(training_data, batch_size=batch_size,  shuffle=True)
 test_dataloader = DataLoader(testing_data, batch_size=batch_size,  shuffle=False)
 
