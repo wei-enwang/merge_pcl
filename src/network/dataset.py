@@ -31,7 +31,7 @@ class rgbd_data(Dataset):
         # For our ease of implementation, suppose number of images is divisible by the length of sequences
         assert len(data_paths) % seq_len == 0
         self.idxs = np.arange(len(data_paths)).reshape((-1,seq_len))
-        if idx_mask:
+        if idx_mask is not None:
             self.idxs = self.idxs[idx_mask,:]
 
     def __len__(self):
