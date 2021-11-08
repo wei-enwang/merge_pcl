@@ -52,6 +52,7 @@ class rgbd_data(Dataset):
             gt_latents = np.load(latents)
             gt_latents_seq.append(gt_latents)
 
-        img_seq, gt_latents_seq = torch.cat(img_seq, dim=0), torch.from_numpy(np.stack(gt_latents_seq, axis=0))
+        img_seq = torch.from_numpy(np.stack(img_seq, axis=0))
+        gt_latents_seq = torch.from_numpy(np.stack(gt_latents_seq, axis=0))
         return img_seq, gt_latents_seq
 

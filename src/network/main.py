@@ -24,6 +24,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 train_test_split = 0.8
 learning_rate = 1e-4
 batch_size = 32
+dropout = 0.
 seq_len = 10
 epochs = 20
 
@@ -69,7 +70,7 @@ testing_data = rgbd_data(data_paths, latent_paths,
 train_dataloader = DataLoader(training_data, batch_size=batch_size,  shuffle=True)
 test_dataloader = DataLoader(testing_data, batch_size=batch_size,  shuffle=False)
 
-model = models.ShapeEncoder().to(device)
+model = models.ShapeEncoder(num_obj=num_objects, dropout=dropout).to(device)
 loss_function = models.crossMSEloss().to(device)
 optim = Adam(model.parameters(), lr=learning_rate)
 
