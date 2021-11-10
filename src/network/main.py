@@ -1,6 +1,7 @@
 from torch.utils.data import DataLoader
 from torch.optim import Adam
 from torchvision import transforms
+
 import random
 import torch
 import torch.cuda
@@ -11,6 +12,7 @@ import glob
 import models
 from dataset import rgbd_data
 from train_test import train_full_test_once
+import transform
 
 
 image_dir = "../data/imgs/"
@@ -49,9 +51,7 @@ mask = np.random.permutation(n)
 # Image preprocessing
 preprocess = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    
+    transform.Rescale(224)
     # transforms.Normalize(mean=[0.485, 0.456, 0.406, None], std=[0.229, 0.224, 0.225, None]),
 ])
 
@@ -64,8 +64,8 @@ testing_data = rgbd_data(data_paths, latent_paths,
 
 # transform images into batches of sequences
 # TODO: change num_workers to 8 when running on GPU
-train_dataloader = DataLoader(training_data, batch_size=batch_size,  shuffle=True)
-test_dataloader = DataLoader(testing_data, batch_size=batch_size,  shuffle=False)
+train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
+test_dataloader = DataLoader(testing_data, batch_size=batch_size, shuffle=False)
 
 model = models.ShapeEncoder(num_obj=num_objects, dropout=dropout).to(device)
 loss_function = models.crossMSEloss().to(device)

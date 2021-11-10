@@ -44,8 +44,10 @@ class rgbd_data(Dataset):
         gt_latents_seq = []
         for i in self.idxs[idx,:]:
             img_path = self.data_paths[i]
+            
             # Apply transform to image
-            img = self.transform(np.load(img_path))
+            img = np.load(img_path)
+            img = self.transform(img)
             img_seq.append(img)
         
             latents = self.latent_paths[i]  
