@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn.functional as F
 
@@ -16,7 +17,7 @@ class Rescale(object):
         self.output_size = output_size
 
     def __call__(self, img):
-
+        print("hi")
         h, w = img.shape[:2]
         if isinstance(self.output_size, int):
             if h > w:
@@ -28,6 +29,6 @@ class Rescale(object):
 
         new_h, new_w = int(new_h), int(new_w)
 
-        img = F.interpolate(torch.permute(torch.unsqueeze(img, dim=0), dims=(0, 3, 1, 2)), size=(new_h, new_w))
+        img = F.interpolate(np.transpose(torch.unsqueeze(img, dim=0), (0, 3, 1, 2)), size=(new_h, new_w))
 
         return img

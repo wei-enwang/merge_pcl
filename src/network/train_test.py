@@ -14,12 +14,13 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     """
     num_batches = len(dataloader)
     total_loss = 0
+    cnt = 0
 
     model.train()
     for X, y in dataloader:
         # Compute prediction and loss
         X, y = X.to(device), y.to(device)
-
+    
         pred = model(X)
         loss = loss_fn(pred, y)
 
@@ -28,7 +29,9 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-
+        if cnt % 10:
+            print(f"Current avg loss:{total_loss/(cnt+1)}\n")
+        cnt += 1   
     # print(f"Training loss: {total_loss/num_batches:>5f}")
     
     return total_loss/num_batches
