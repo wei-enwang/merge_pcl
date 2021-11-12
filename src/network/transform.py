@@ -31,4 +31,4 @@ class Rescale(object):
 
         img = F.interpolate(np.transpose(torch.unsqueeze(img, dim=0), (0, 3, 1, 2)), size=(new_h, new_w))
 
-        return img
+        return torch.squeeze(img)

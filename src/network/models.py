@@ -6,38 +6,6 @@ from torch import nn
 from torch import Tensor
 from torchvision import models
 
-def resnet18_4d(model = models.resnet18(pretrained=True), new_in_channels=4, latent_size=512):
-
-    layer = model.conv1
-    layer.requires_grad = False
-    # Creating new Conv2d layer
-    new_layer = nn.Conv2d(in_channels=new_in_channels, 
-                    out_channels=layer.out_channels, 
-                    kernel_size=layer.kernel_size, 
-                    stride=layer.stride, 
-                    padding=layer.padding,
-                    bias=layer.bias)
-
-    copy_weights = 0 # Here will initialize the weights from new channel with the red channel weights
-
-    # Copying the weights from the old to the new layer
-    new_layer.weight.requires_grad = False
-    new_layer.weight[:, :layer.in_channels, :, :] = layer.weight.clone()
-
-    #Copying the weights of the `copy_weights` channel of the old layer to the extra channels of the new layer
-    for i in range(new_in_channels - layer.in_channels):
-        channel = layer.in_channels + i
-        new_layer.weight[:, channel:channel+1, :, :] = layer.weight[:, copy_weights:copy_weights+1, : :].clone()
-    new_layer.weight = nn.Parameter(new_layer.weight)
-
-    model.conv1 = new_layer
-    model.conv1.weight.requires_grad = True
-
-    # modify output layer
-    model.fc = nn.Linear(512, latent_size)
-
-    return model
-
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
     """3x3 convolution with padding"""
     return nn.Conv2d(
@@ -314,6 +282,9 @@ class ShapeEncoder(nn.Module):
 
         """
         b_size, num_scenes = input.shape[0], input.shape[1]
+        assert input.shape[2] == 4
+        assert input.shape[3] == 224
+        assert input.shape[4] == 224
         hidden = self.forward_cnn(input)
         latents, _ = self.rnn(hidden)
         return latents.reshape((b_size, num_scenes, self.num_obj, self.output_size))
@@ -476,8 +447,12 @@ class crossMSEloss(nn.Module):
 
     def forward(self, inputs, targets):
         """
-        inputs (batch_size, seq_len, num_preds, latent_size): The latents predicted by the LSTM network
-        targets (batch_size, seq_len, num_objects, latent_size): The ground truth latents
+        Args:
+        -inputs (batch_size, seq_len, num_preds, latent_size): The latents predicted by the LSTM network
+        -targets (batch_size, seq_len, num_objects, latent_size): The ground truth latents
+
+        Returns;
+        - loss: A scalar that represents the average loss.
         """
         conf = inputs[...,-1]
         preds = inputs[...,:-1]
@@ -492,5 +467,6 @@ class crossMSEloss(nn.Module):
         loss = torch.sum(conf*torch.min(l2norm, dim=-1)[0], dim=-1)+ \
                torch.sum(torch.min(1/conf[...,None]*l2norm, dim=2)[0], dim=-1)
 
-        return loss
+        # The return value is the average loss over batch_size and seq_len
+        return loss.mean()
 

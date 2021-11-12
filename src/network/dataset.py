@@ -1,6 +1,5 @@
 import torch
 import json
-import pickle
 
 from torch.utils.data import Dataset
 import numpy as np
@@ -45,16 +44,16 @@ class rgbd_data(Dataset):
         for i in self.idxs[idx,:]:
             img_path = self.data_paths[i]
             
+            img = np.load(img_path).astype(int)
             # Apply transform to image
-            img = np.load(img_path)
             img = self.transform(img)
             img_seq.append(img)
         
             latents = self.latent_paths[i]  
-            gt_latents = np.load(latents)
+            gt_latents = np.load(latents) 
             gt_latents_seq.append(gt_latents)
 
-        img_seq = torch.from_numpy(np.stack(img_seq, axis=0))
+        img_seq = torch.from_numpy(np.stack(img_seq, axis=0).astype(float))
         gt_latents_seq = torch.from_numpy(np.stack(gt_latents_seq, axis=0))
         return img_seq, gt_latents_seq
 

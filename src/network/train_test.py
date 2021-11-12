@@ -21,7 +21,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         # Compute prediction and loss
         X, y = X.to(device), y.to(device)
     
-        pred = model(X)
+        pred = model(X.float())
         loss = loss_fn(pred, y)
 
         # Backpropagation
