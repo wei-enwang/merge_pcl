@@ -25,7 +25,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # hyperparameters
 train_test_split = 0.8
 learning_rate = 1e-4
-batch_size = 32
+batch_size = 8
 dropout = 0.
 seq_len = 10
 epochs = 20
@@ -64,8 +64,8 @@ testing_data = rgbd_data(data_paths, latent_paths,
 
 # transform images into batches of sequences
 # TODO: change num_workers to 8 when running on GPU
-train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
-test_dataloader = DataLoader(testing_data, batch_size=batch_size, shuffle=False)
+train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
+test_dataloader = DataLoader(testing_data, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
 
 model = models.ShapeEncoder(num_obj=num_objects, dropout=dropout).to(device)
 loss_function = models.crossMSEloss().to(device)

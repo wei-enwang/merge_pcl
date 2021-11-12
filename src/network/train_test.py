@@ -22,14 +22,14 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         X, y = X.to(device), y.to(device)
     
         pred = model(X.float())
-        loss = loss_fn(pred, y)
+        loss = loss_fn(pred, y.float())
 
         # Backpropagation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-        if cnt % 10:
+        if cnt % 100:
             print(f"Current avg loss:{total_loss/(cnt+1)}\n")
         cnt += 1   
     # print(f"Training loss: {total_loss/num_batches:>5f}")
@@ -46,9 +46,9 @@ def test_loop(dataloader, model, loss_fn, device):
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
-            pred = model(X)
+            pred = model(X.float())
 
-            total_loss += loss_fn(pred, y).item()
+            total_loss += loss_fn(pred, y.float()).item()
 
     return total_loss/num_batches
 
