@@ -455,6 +455,8 @@ class crossMSEloss(nn.Module):
         - loss: A scalar that represents the average loss.
         """
         conf = inputs[...,-1]
+        # confidence need to be positive
+        conf = conf**2
         preds = inputs[...,:-1]
 
         # check latent size matches

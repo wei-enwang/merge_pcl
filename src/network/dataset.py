@@ -1,6 +1,7 @@
 import torch
 import json
 
+from PIL import Image
 from torch.utils.data import Dataset
 import numpy as np
 
@@ -46,6 +47,7 @@ class rgbd_data(Dataset):
             
             img = np.load(img_path).astype(int)
             # Apply transform to image
+            img = Image.fromarray(img, mode="RGBA")
             img = self.transform(img)
             img_seq.append(img)
         
