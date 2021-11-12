@@ -295,7 +295,7 @@ class Scene(object):
 
         return process_pybullet_image(img, IMAGE_WIDTH, IMAGE_HEIGHT)
     
-    def raw_rgbd(self, viewMat=None, projMat=None):
+    def raw_rgbd(self, w=IMAGE_WIDTH, h=IMAGE_HEIGHT, viewMat=None, projMat=None):
         """
         Return the raw_rgbd image in the form of numpy arrays
         (for PyTorch)
@@ -305,12 +305,12 @@ class Scene(object):
         if projMat is None:
             projMat = self.projMatrix
 
-        _, _, rgb_img, depth_img, _ = p.getCameraImage(IMAGE_WIDTH, IMAGE_HEIGHT, viewMatrix=viewMat, projectionMatrix=projMat, renderer=p.ER_TINY_RENDERER)
+        _, _, rgb_img, depth_img, _ = p.getCameraImage(w, h, viewMatrix=viewMat, projectionMatrix=projMat, renderer=p.ER_TINY_RENDERER)
 
         # still need to reshape image
-        rgb_img = process_pybullet_image(rgb_img, IMAGE_WIDTH, IMAGE_HEIGHT)
+        rgb_img = process_pybullet_image(rgb_img, w, h)
         # multiply depth_img by 255 so that torch.ToTensor() can handle the entire rgbd image
-        rgbd_img = np.concatenate((rgb_img, np.array(255*depth_img).reshape((IMAGE_WIDTH, IMAGE_HEIGHT,1))), axis=-1)
+        rgbd_img = np.concatenate((rgb_img, np.array(255*depth_img).reshape((w, h, 1))), axis=-1)
 
         return rgbd_img
 

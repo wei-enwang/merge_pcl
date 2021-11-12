@@ -33,6 +33,7 @@ def all_latent_generator(objects, data_dir, latent_size=128, save=True):
 save_data_dir = "data/imgs/"
 save_latent_dir = "data/latents/"
 num_scenes = 10000
+img_size = 224
 scene = Scene()
 
 object_name_list = ['basket', 'chair', 'chest', 'fridge', 'sofa', 'plant', 'piano', 'guitar', 'toilet', 
@@ -60,7 +61,7 @@ for i in range(num_scenes):
     scene.place_objects_no_table(used_objs, size=1.5, vis=False)
     
     # Get new scene
-    scene_rgbd_img = scene.raw_rgbd()
+    scene_rgbd_img = scene.raw_rgbd(w=img_size, h=img_size)
 
     # below for debug purposes
     # imwrite("test"+str(i)+".png", test_img)
