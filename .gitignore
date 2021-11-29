@@ -11,6 +11,7 @@ src/multiscene_results/
 *.json
 *.npy
 *.urdf
+*.off
 
 # Byte-compiled / optimized / DLL files
 src/__pycache__/
