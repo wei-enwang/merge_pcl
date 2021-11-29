@@ -32,27 +32,33 @@ def all_latent_generator(objects, data_dir, latent_size=128, save=True):
 
 save_data_dir = "data/imgs/"
 save_latent_dir = "data/latents/"
-num_scenes = 10000
+# change this to 10000 when training
+num_scenes = 10
+max_obj_num = 10
+
 img_size = 224
 scene = Scene()
 
-object_name_list = ['basket', 'chair', 'chest', 'fridge', 'sofa', 'plant', 'piano', 'guitar', 'toilet', 
-'floor_lamp']
-max_obj_num = len(object_name_list)
+# object_name_list = ['basket', 'chair', 'chest', 'fridge', 'sofa', 'plant', 'piano', 'guitar', 'toilet', 
+# 'floor_lamp']
+# max_obj_num = len(object_name_list)
 
-obj_list = []
-for name in object_name_list:
-    obj_list.append(sorted(glob.glob("../ig_dataset/objects/"+name+"/*/*.urdf"))[0])
+# obj_list = []
+# for name in object_name_list:
+
+obj_list = sorted(glob.glob("./data/obj/ShapeNetCore.v2/*/*/model/model_normalized.obj"))
 
 # Generate latents for the first time
-all_latent_generator(obj_list, save_latent_dir)
+# all_latent_generator(obj_list, save_latent_dir)
 
+# TODO: edit the following 
 with open(save_latent_dir+"trial_latents.json", "r") as f:
     current_latent_dict = json.load(f)
+
 for i in range(num_scenes):
 
     # Select number of objects in this scene
-    num_obj = np.random.randint(len(object_name_list))+1
+    num_obj = np.random.randint(max_obj_num)+1
     used_objs = np.random.choice(obj_list, size=num_obj, replace=False)
 
     # Make new view angle (pitch)
