@@ -49,6 +49,8 @@ class OccupancyNetwork(nn.Module):
 
         self._device = device
         self.p0_z = p0_z
+        # self.latent_dict = {}
+        # self.latent_embed = nn.Embedding(num_obj, 512)
 
     def forward(self, p, inputs, sample=True, **kwargs):
         ''' Performs a forward pass through the network.

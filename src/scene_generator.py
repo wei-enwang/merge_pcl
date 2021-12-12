@@ -30,8 +30,8 @@ def all_latent_generator(objects, data_dir, latent_size=128, save=True):
             json.dump(latents, data)
 
 
-save_data_dir = "data/imgs/"
-save_latent_dir = "data/latents/"
+save_data_dir = "./data/imgs/"
+save_latent_dir = "./data/latents/"
 # change this to 10000 when training
 num_scenes = 10
 max_obj_num = 10
