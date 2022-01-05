@@ -6,7 +6,7 @@ import glob
 trimesh.util.attach_to_log()
 
 output_dir = "../occupancy_networks/external/mesh-fusion/occ_src/raw/"
-obj_list = sorted(glob.glob("./data/obj/shapenet/*/*/models/model_normalized.obj"))
+obj_list = sorted(glob.glob("./data/obj/ShapeNetCore.v2/*/*/models/model_normalized.obj"))
 # print(len(obj_list))
 
 for obj in obj_list:
