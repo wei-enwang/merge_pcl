@@ -14,4 +14,8 @@ for obj in obj_list:
                  [-4], os.path.normpath(obj).split(os.sep)[-3])
     mesh = trimesh.load(obj, force='mesh')
     # save as .off, retain file name
-    mesh.export(output_dir+fileName+".off")
+    directory = output_dir+fileName+".off"
+    
+    if not os.path.exists(os.path.dirname(directory)):
+        os.makedirs(os.path.dirname(directory))
+    mesh.export(directory)
