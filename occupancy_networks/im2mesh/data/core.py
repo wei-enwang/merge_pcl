@@ -84,6 +84,7 @@ class Shapes3dDataset(data.Dataset):
                 logger.warning('Category %s does not exist in dataset.' % c)
 
             split_file = os.path.join(subpath, split + '.lst')
+            # Select models based on split file
             with open(split_file, 'r') as f:
                 models_c = f.read().split('\n')
             

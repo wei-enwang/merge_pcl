@@ -22,3 +22,13 @@
     If 0.005 > FRMSD > 0.003, the new cloud is stored as a new representation of the item, while the cloud is classified as a new object if FRMSD is greater than 0.005.</li>
     </ul>
 </p>
+<p>
+    This program accepts input 3d models in the form of commmon pointcloud formats (.obj, readable by trimesh). Run `sample_mesh` to organize pointcloud files into desired formats.
+</p>
+<h2>TODO</h2>
+<p>
+    <ul>
+    <li>Write script to create split in every model category(code done)</li>
+    <li>Write script to transform obj files into numpy readable format(modify sample_mesh)</li>
+    </ul>
+</p>

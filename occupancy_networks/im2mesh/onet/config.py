@@ -121,6 +121,7 @@ def get_prior_z(cfg, device, **kwargs):
     return p0_z
 
 
+# rewrite this
 def get_data_fields(mode, cfg):
     ''' Returns the data fields.
 

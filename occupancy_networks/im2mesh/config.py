@@ -15,6 +15,7 @@ method_dict = {
 
 
 # General config
+# config is returned as a dictionary
 def load_config(path, default_path=None):
     ''' Loads config file.
 

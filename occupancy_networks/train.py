@@ -21,7 +21,7 @@ parser.add_argument('--exit-after', type=int, default=-1,
                          'with exit code 2.')
 
 args = parser.parse_args()
-cfg = config.load_config(args.config, 'configs/default.yaml')
+# cfg = config.load_config(args.config, 'configs/default.yaml')
 is_cuda = (torch.cuda.is_available() and not args.no_cuda)
 device = torch.device("cuda" if is_cuda else "cpu")
 
@@ -31,8 +31,8 @@ t0 = time.time()
 # Shorthands
 out_dir = cfg['training']['out_dir']
 batch_size = cfg['training']['batch_size']
-backup_every = cfg['training']['backup_every']
-exit_after = args.exit_after
+# backup_every = cfg['training']['backup_every']
+# exit_after = args.exit_after
 
 model_selection_metric = cfg['training']['model_selection_metric']
 if cfg['training']['model_selection_mode'] == 'maximize':
