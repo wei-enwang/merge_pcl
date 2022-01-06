@@ -54,8 +54,9 @@ class Scale:
         """
 
         files = []
-        for filename in os.listdir(directory):
-            files.append(os.path.normpath(os.path.join(directory, filename)))
+        for path, subdirs, files in os.walk(directory):
+            for name in files:
+                files.append(os.path.normpath(os.path.join(path, name)))
 
         return files
 
@@ -152,9 +153,11 @@ class Scale:
 
         outpath_m, outpath_t = self.get_outpath(filepath)
 
+        common.makedir(os.path.dirname(outpath_m))
         mesh.to_off(outpath_m)
 
         if outpath_t is not None:
+            common.makedir(os.path.dirname(outpath_t))
             np.savez(outpath_t,
                      loc=centers, scale=scale,
                      bb0_min=bb_min, bb0_max=bb_max,

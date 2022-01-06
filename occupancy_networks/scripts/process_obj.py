@@ -13,7 +13,7 @@ sys.path.append('..')
 
 
 parser = argparse.ArgumentParser('Sample a mesh.')
-parser.add_argument('in_folder', type=str,
+parser.add_argument('in_folder', type=str, default='external/mesh-fusion/occ_src/scaled/',
                     help='Path to input watertight meshes.')
 parser.add_argument('--n_proc', type=int, default=0,
                     help='Number of processes to use.')
@@ -30,17 +30,17 @@ parser.add_argument('--bbox_in_folder', type=str,
                     help='Path to other input folder to extract'
                          'bounding boxes.')
 
-parser.add_argument('--pointcloud_folder', type=str,
+parser.add_argument('--pointcloud_folder', type=str, default='data/pcl/',
                     help='Output path for point cloud.')
 parser.add_argument('--pointcloud_size', type=int, default=100000,
                     help='Size of point cloud.')
 
-parser.add_argument('--voxels_folder', type=str,
+parser.add_argument('--voxels_folder', type=str, default='data/voxel/',
                     help='Output path for voxelization.')
 parser.add_argument('--voxels_res', type=int, default=32,
                     help='Resolution for voxelization.')
 
-parser.add_argument('--points_folder', type=str,
+parser.add_argument('--points_folder', type=str, default='data/points/',
                     help='Output path for points.')
 parser.add_argument('--points_size', type=int, default=100000,
                     help='Size of points.')
@@ -54,7 +54,7 @@ parser.add_argument('--points_padding', type=float, default=0.1,
                     help='Additional padding applied to the uniformly'
                          'sampled points on both sides (in total).')
 
-parser.add_argument('--mesh_folder', type=str,
+parser.add_argument('--mesh_folder', type=str, default='data/mesh/',
                     help='Output path for mesh.')
 
 parser.add_argument('--overwrite', action='store_true',
@@ -140,6 +140,8 @@ def export_pointcloud(mesh, modelname, loc, scale, args):
     normals = normals.astype(dtype)
 
     print('Writing pointcloud: %s' % filename)
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
     np.savez(filename, points=points, normals=normals, loc=loc, scale=scale)
 
 
@@ -162,6 +164,8 @@ def export_voxels(mesh, modelname, loc, scale, args):
                                   translate=loc, scale=scale,
                                   axis_order='xyz')
     print('Writing voxels: %s' % filename)
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
     with open(filename, 'bw') as f:
         voxels_out.write(f)
 
@@ -202,6 +206,8 @@ def export_points(mesh, modelname, loc, scale, args):
         occupancies = np.packbits(occupancies)
 
     print('Writing points: %s' % filename)
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
     np.savez(filename, points=points, occupancies=occupancies,
              loc=loc, scale=scale)
 
@@ -212,6 +218,8 @@ def export_mesh(mesh, modelname, loc, scale, args):
         print('Mesh already exist: %s' % filename)
         return
     print('Writing mesh: %s' % filename)
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
     mesh.export(filename)
 
 
