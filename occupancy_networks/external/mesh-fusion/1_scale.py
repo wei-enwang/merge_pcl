@@ -54,8 +54,7 @@ class Scale:
         :return: list of files
         """
 
-        files = sorted(glob.glob(os.path.join(directory, "/*/*.off")))
-
+        files = sorted(glob.glob(directory+"*/*.off"))
         return files
 
     def get_in_files(self):
