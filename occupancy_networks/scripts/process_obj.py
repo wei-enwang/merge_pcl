@@ -13,7 +13,7 @@ from im2mesh.utils import binvox_rw, voxels
 
 
 parser = argparse.ArgumentParser('Sample a mesh.')
-parser.add_argument('--in_folder', type=str, default='external/mesh-fusion/occ_src/scaled/',
+parser.add_argument('--in_folder', type=str, default='../external/mesh-fusion/occ_src/scaled/',
                     help='Path to input watertight meshes.')
 parser.add_argument('--n_proc', type=int, default=0,
                     help='Number of processes to use.')
@@ -30,17 +30,17 @@ parser.add_argument('--bbox_in_folder', type=str,
                     help='Path to other input folder to extract'
                          'bounding boxes.')
 
-parser.add_argument('--pointcloud_folder', type=str, default='data/pcl/',
+parser.add_argument('--pointcloud_folder', type=str, default='../data/pcl/',
                     help='Output path for point cloud.')
 parser.add_argument('--pointcloud_size', type=int, default=100000,
                     help='Size of point cloud.')
 
-parser.add_argument('--voxels_folder', type=str, default='data/voxel/',
+parser.add_argument('--voxels_folder', type=str, default='../data/voxel/',
                     help='Output path for voxelization.')
 parser.add_argument('--voxels_res', type=int, default=32,
                     help='Resolution for voxelization.')
 
-parser.add_argument('--points_folder', type=str, default='data/points/',
+parser.add_argument('--points_folder', type=str, default='../data/points/',
                     help='Output path for points.')
 parser.add_argument('--points_size', type=int, default=100000,
                     help='Size of points.')
@@ -54,7 +54,7 @@ parser.add_argument('--points_padding', type=float, default=0.1,
                     help='Additional padding applied to the uniformly'
                          'sampled points on both sides (in total).')
 
-parser.add_argument('--mesh_folder', type=str, default='data/mesh/',
+parser.add_argument('--mesh_folder', type=str, default='../data/mesh/',
                     help='Output path for mesh.')
 
 parser.add_argument('--overwrite', action='store_true',
@@ -67,7 +67,6 @@ parser.add_argument('--packbits', action='store_true',
 
 def main(args):
     input_files = glob.glob(os.path.join(args.in_folder, '**/*.off'), recursive=True)
-    import pdb; pdb.set_trace()
     if args.n_proc != 0:
         with Pool(args.n_proc) as p:
             p.map(partial(process_path, args=args), input_files)
