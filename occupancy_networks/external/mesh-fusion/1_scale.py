@@ -54,7 +54,7 @@ class Scale:
         :return: list of files
         """
 
-        files = sorted(glob.glob(directory+"*/*.off"))
+        files = sorted(glob.glob(directory+"**/*.off", recursive=True))
         return files
 
     def get_in_files(self):
@@ -79,7 +79,10 @@ class Scale:
 
 
     def get_outpath(self, filepath):
-        filename_m = os.path.basename(filepath)
+        if self.options.in_dir is not None:
+            filename_m = os.path.relpath(filepath, self.options.in_dir)
+        else:
+            filename_m = os.path.relpath(filepath, os.path.abspath(__file__))
         outpath_m = os.path.join(self.options.out_dir, filename_m)
 
         if self.options.t_dir is not None:
