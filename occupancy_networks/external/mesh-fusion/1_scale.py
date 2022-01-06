@@ -1,5 +1,6 @@
 import os
 import common
+import glob
 import argparse
 import numpy as np
 from multiprocessing import Pool
@@ -53,10 +54,7 @@ class Scale:
         :return: list of files
         """
 
-        files = []
-        for path, subdirs, files in os.walk(directory):
-            for name in files:
-                files.append(os.path.normpath(os.path.join(path, name)))
+        files = sorted(glob.glob(os.path.join(directory, "/*/*.off")))
 
         return files
 
