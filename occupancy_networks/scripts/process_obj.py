@@ -1,5 +1,3 @@
-from im2mesh.utils.libmesh import check_mesh_contains
-from im2mesh.utils import binvox_rw, voxels
 import argparse
 import trimesh
 import numpy as np
@@ -10,6 +8,8 @@ from multiprocessing import Pool
 from functools import partial
 # TODO: do this better
 sys.path.append('..')
+from im2mesh.utils.libmesh import check_mesh_contains
+from im2mesh.utils import binvox_rw, voxels
 
 
 parser = argparse.ArgumentParser('Sample a mesh.')
