@@ -13,7 +13,7 @@ from im2mesh.utils import binvox_rw, voxels
 
 
 parser = argparse.ArgumentParser('Sample a mesh.')
-parser.add_argument('in_folder', type=str, default='external/mesh-fusion/occ_src/scaled/',
+parser.add_argument('--in_folder', type=str, default='external/mesh-fusion/occ_src/scaled/',
                     help='Path to input watertight meshes.')
 parser.add_argument('--n_proc', type=int, default=0,
                     help='Number of processes to use.')
@@ -66,7 +66,8 @@ parser.add_argument('--packbits', action='store_true',
 
 
 def main(args):
-    input_files = glob.glob(os.path.join(args.in_folder, '*.off'))
+    input_files = glob.glob(os.path.join(args.in_folder, '**/*.off'), recursive=True)
+    import pdb; pdb.set_trace()
     if args.n_proc != 0:
         with Pool(args.n_proc) as p:
             p.map(partial(process_path, args=args), input_files)
