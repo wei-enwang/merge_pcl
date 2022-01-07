@@ -8,8 +8,9 @@ src/models/
 src/pcl_results/
 src/multiscene_results/
 
-occupancy_network/build/
-occupancy_network/external/
+occupancy_networks/build/
+occupancy_networks/data/
+occupancy_networks/external/
 
 *.json
 *.npy
