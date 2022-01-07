@@ -38,8 +38,8 @@ for p in os.listdir(in_folder):
     if os.path.isdir(work_dir):
         
         samples = []
-        for type in ["*.off", "*.npz", "*.obj"]:
-            samples.extend(glob.glob(os.path.join(work_dir, "*.off")))
+        for filetype in ["*.off", "*.npz", "*.obj"]:
+            samples.extend(glob.glob(work_dir+filetype))
         random.shuffle(samples)
 
         # Number of examples
