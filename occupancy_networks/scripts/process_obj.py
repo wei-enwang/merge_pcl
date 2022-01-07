@@ -77,7 +77,7 @@ def main(args):
 
 def process_path(in_path, args):
     #in_file = os.path.basename(in_path)
-    modelname = os.path.relpath(in_path, args.in_folder)
+    modelname = os.path.relpath(in_path, args.in_folder)[:-4]
     mesh = trimesh.load(in_path, process=False)
 
     # Determine bounding box
