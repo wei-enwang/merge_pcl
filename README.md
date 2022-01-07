@@ -29,6 +29,6 @@
 <p>
     <ul>
     <li>Write script to create split in every model category(code done)</li>
-    <li>Write script to transform obj files into numpy readable format(modify sample_mesh)</li>
+    <li>Write script to transform obj files into numpy readable format(done)</li>
     </ul>
 </p>

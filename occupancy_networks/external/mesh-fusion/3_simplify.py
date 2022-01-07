@@ -1,4 +1,5 @@
 import os
+import glob
 import argparse
 import ntpath
 import common
@@ -45,10 +46,7 @@ class Simplification:
         :return: list of files
         """
 
-        files = []
-        for filename in os.listdir(directory):
-            files.append(os.path.normpath(os.path.join(directory, filename)))
-
+        files = sorted(glob.glob(directory+"**/*.off", recursive=True))
         return files
 
     def get_in_files(self):
@@ -70,9 +68,12 @@ class Simplification:
         files = self.get_in_files()
 
         for filepath in files:
+            outpath = os.path.join(self.options.out_dir, os.path.relpath(
+                filepath, self.options.in_dir))
+            common.makedir(os.path.dirname(outpath))
             os.system('meshlabserver -i %s -o %s -s %s' % (
                 filepath,
-                os.path.join(self.options.out_dir, ntpath.basename(filepath)),
+                outpath,
                 self.simplification_script
             ))
 

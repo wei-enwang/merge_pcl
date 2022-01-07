@@ -10,7 +10,10 @@ src/multiscene_results/
 
 occupancy_networks/build/
 occupancy_networks/data/
-occupancy_networks/external/
+occupancy_networks/external/mesh-fusion/libfusioncpu
+occupancy_networks/external/mesh-fusion/libfusiongpu
+occupancy_networks/external/mesh-fusion/libmcubes
+occupancy_networks/external/mesh-fusion/librender
 
 *.json
 *.npy

@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import os
+import glob
 from scipy import ndimage
 from scipy.interpolate import RegularGridInterpolator as rgi
 import common
@@ -123,10 +124,7 @@ class Fusion:
         :return: list of files
         """
 
-        files = []
-        for filename in os.listdir(directory):
-            files.append(os.path.normpath(os.path.join(directory, filename)))
-
+        files = sorted(glob.glob(directory+"**/*.off", recursive=True))
         return files
 
     def get_in_files(self):
@@ -146,7 +144,11 @@ class Fusion:
         return files
 
     def get_outpath(self, filepath):
-        filename = os.path.basename(filepath)
+        if self.options.in_dir is not None:
+            filename = os.path.relpath(filepath, self.options.in_dir)[:-4]
+        else:
+            filename = os.path.relpath(filepath, os.path.abspath(__file__))[:-4]
+
         if self.options.mode == 'render':
             outpath = os.path.join(self.options.out_dir, filename + '.h5')
         elif self.options.mode == 'fuse':
@@ -322,6 +324,7 @@ class Fusion:
         depths = self.render(mesh, Rs)
 
         depth_file = self.get_outpath(filepath)
+        common.makedir(os.path.dirname(depth_file))
         common.write_hdf5(depth_file, np.array(depths))
         print('[Data] wrote %s (%f seconds)' % (depth_file, timer.elapsed()))
 
@@ -352,6 +355,7 @@ class Fusion:
         vertices = t_loc + t_scale * vertices
 
         off_file = self.get_outpath(filepath)
+        common.makedir(os.path.dirname(off_file))
         libmcubes.export_off(vertices, triangles, off_file)
         print('[Data] wrote %s (%f seconds)' % (off_file, timer.elapsed()))
 
@@ -382,6 +386,7 @@ class Fusion:
 
         occupancy = (values <= 0.)
         out_file = self.get_outpath(filepath)
+        common.makedir(os.path.dirname(out_file))
         np.savez(out_file, points=points, occupancy=occupancy, loc=t_loc, scale=t_scale)
 
         print('[Data] wrote %s (%f seconds)' % (out_file, timer.elapsed()))
