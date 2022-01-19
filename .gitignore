@@ -8,6 +8,7 @@ src/models/
 src/pcl_results/
 src/multiscene_results/
 
+occupancy_networks/out/
 occupancy_networks/build/
 occupancy_networks/data/
 occupancy_networks/external/mesh-fusion/libfusioncpu
@@ -27,3 +28,8 @@ src/__pycache__/
 *$py.class
 *.pyc
 *.DS_Store
+
+
+# model files
+*.pt
+*.pth
