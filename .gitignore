@@ -14,6 +14,7 @@ occupancy_networks/external/mesh-fusion/libfusioncpu
 occupancy_networks/external/mesh-fusion/libfusiongpu
 occupancy_networks/external/mesh-fusion/libmcubes
 occupancy_networks/external/mesh-fusion/librender
+occupancy_networks/external/mesh-fusion/occ_src
 
 *.json
 *.npy
