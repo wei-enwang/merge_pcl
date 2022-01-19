@@ -71,7 +71,7 @@ class Shapes3dDataset(data.Dataset):
             self.metadata = {
                 c: {'id': c, 'name': 'n/a'} for c in categories
             } 
-        
+        import pdb; pdb.set_trace()
         # Set index
         for c_idx, c in enumerate(categories):
             self.metadata[c]['idx'] = c_idx
