@@ -32,7 +32,7 @@ t0 = time.time()
 out_dir = cfg['training']['out_dir']
 batch_size = cfg['training']['batch_size']
 # backup_every = cfg['training']['backup_every']
-# exit_after = args.exit_after
+exit_after = args.exit_after
 
 model_selection_metric = cfg['training']['model_selection_metric']
 if cfg['training']['model_selection_mode'] == 'maximize':
@@ -141,10 +141,10 @@ while True:
                                loss_val_best=metric_val_best)
 
         # Backup if necessary
-        if (backup_every > 0 and (it % backup_every) == 0):
-            print('Backup checkpoint')
-            checkpoint_io.save('model_%d.pt' % it, epoch_it=epoch_it, it=it,
-                               loss_val_best=metric_val_best)
+        # if (backup_every > 0 and (it % backup_every) == 0):
+        #     print('Backup checkpoint')
+        #     checkpoint_io.save('model_%d.pt' % it, epoch_it=epoch_it, it=it,
+        #                        loss_val_best=metric_val_best)
         # Run validation
         if validate_every > 0 and (it % validate_every) == 0:
             eval_dict = trainer.evaluate(val_loader)
