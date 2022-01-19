@@ -13,7 +13,7 @@ from im2mesh.utils import binvox_rw, voxels
 
 
 parser = argparse.ArgumentParser('Sample a mesh.')
-parser.add_argument('--in_folder', type=str, default='../external/mesh-fusion/occ_src/scaled/',
+parser.add_argument('--in_folder', type=str, default='../external/mesh-fusion/examples/scaled/',
                     help='Path to input watertight meshes.')
 parser.add_argument('--n_proc', type=int, default=0,
                     help='Number of processes to use.')
@@ -106,6 +106,8 @@ def process_path(in_path, args):
             R = trimesh.transformations.rotation_matrix(angle, [0, 1, 0])
             mesh.apply_transform(R)
 
+    if not mesh.is_watertight:
+        trimesh.repair.fill_holes(mesh)
     # Expert various modalities
     if args.pointcloud_folder is not None:
         export_pointcloud(mesh, modelname, loc, scale, args)

@@ -1,10 +1,19 @@
 #ifndef LIBRENDER_OFFSCREEN_H
 #define LIBRENDER_OFFSCREEN_H
 
+#if defined(__APPLE__)
+#include <GL/glew.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#else
 #include "GL/glew.h"
 #include "GL/gl.h"
 #include "GL/glu.h"
 #include "GL/glut.h"
+#endif
+
+
 
 class OffscreenGL {
 
