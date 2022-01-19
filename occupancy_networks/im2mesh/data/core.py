@@ -57,7 +57,8 @@ class Shapes3dDataset(data.Dataset):
 
         # If categories is None, use all subfolders
         if categories is None:
-            categories = sorted(os.listdir(dataset_folder))
+            categories = [d for d in os.listdir(dataset_folder) 
+            if os.path.isdir(os.path.join(dataset_folder, d))]
             # print(categories)
             # categories = [c for c in categories
             #              if os.path.isdir(os.path.join(dataset_folder, c))]
