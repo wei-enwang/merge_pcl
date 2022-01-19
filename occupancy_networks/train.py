@@ -21,8 +21,7 @@ parser.add_argument('--exit-after', type=int, default=-1,
 
 args = parser.parse_args()
 cfg = config.load_config(args.config, 'configs/default.yaml')
-is_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if is_cuda else "cpu")
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Set t0
 t0 = time.time()
